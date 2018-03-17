@@ -42,7 +42,7 @@ const instantiateApplication = app => {
   new RouteGenerator({
     routes: routes,
     app: app,
-    baseUri: '/api'
+    baseUri: '/'
   })
 
   app.listen(8080)
