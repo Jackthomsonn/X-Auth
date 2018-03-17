@@ -1,0 +1,16 @@
+{
+  "name": "jwt-auth",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Jack Thomson",
+  "license": "ISC",
+  "scripts": {
+    "start": "node index"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.16.2",
+    "jsonwebtoken": "^8.2.0",
+    "mongoose": "^5.0.8"
+  }
+}
