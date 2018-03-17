@@ -16,8 +16,6 @@ const instantiateApplication = app => {
       methods: [{
         name: 'post',
         handlers: [HandleLogin]
-      }, {
-        name: 'get'
       }]
     }, {
       uri: '/auth/register',

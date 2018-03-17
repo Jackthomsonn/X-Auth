@@ -2,6 +2,10 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user.model')
 const env = require('../env')
 
+const signToken = (user) => {
+  return jwt.sign({ user: user.username }, env.AUTH_SECRET_KEY)
+}
+
 const HandleLogin = (req, res) => {
   const username = req.body.username
   const password = req.body.password
@@ -24,7 +28,7 @@ const HandleLogin = (req, res) => {
     } else {
       user.comparePassword(password, (err, isMatch) => {
         if (isMatch) {
-          res.cookie(env.COOKIE_NAME, jwt.sign({ user: user.username }, env.AUTH_SECRET_KEY), {
+          res.cookie(env.COOKIE_NAME, signToken(user), {
             maxAge: 3600000
           })
 

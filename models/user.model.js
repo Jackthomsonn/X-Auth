@@ -15,14 +15,12 @@ const userSchema = new mongoose.Schema({
 
 const checkUsernameIsAvailable = (user) => {
   return new Promise((resolve, reject) => {
-    const UserModel = mongoose.model('UserModel', userSchema)
-
     UserModel.findOne({ username: user.username }, (err, user) => {
       if (!err) {
         if (!user) {
           resolve()
         } else {
-          reject()
+          reject('A user with that username already exists')
         }
       }
 
@@ -32,7 +30,6 @@ const checkUsernameIsAvailable = (user) => {
 }
 
 userSchema.pre('save', function (next) {
-  const UserModel = mongoose.model('UserModel', userSchema)
   const user = this
 
   checkUsernameIsAvailable(user).then(() => {
@@ -54,8 +51,8 @@ userSchema.pre('save', function (next) {
         next()
       })
     })
-  }).catch(() => {
-    return next(new Error('A user with that username already exists'))
+  }).catch(error => {
+    return next(new Error(error))
   })
 })
 
@@ -69,4 +66,6 @@ userSchema.methods.comparePassword = function (candidatePassword, cb) {
   })
 }
 
-module.exports = mongoose.model('Users', userSchema)
+const UserModel = mongoose.model('Users', userSchema)
+
+module.exports = UserModel
