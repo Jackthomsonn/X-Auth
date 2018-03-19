@@ -1,6 +1,16 @@
 const mongoose = require('mongoose')
 
-const gameSchema = new mongoose.Schema({
+class GameSchema extends mongoose.Schema {
+  constructor(definition) {
+    super(definition)
+  }
+
+  getModel() {
+    return mongoose.model('Game', this)
+  }
+}
+
+module.exports = new GameSchema({
   name: {
     required: true,
     type: String
@@ -9,6 +19,4 @@ const gameSchema = new mongoose.Schema({
     required: true,
     type: String
   }
-})
-
-module.exports = mongoose.model('Games', gameSchema)
+}).getModel()

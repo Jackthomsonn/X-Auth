@@ -1,12 +1,15 @@
+const app = require('express')()
 const mongoose = require('mongoose')
+
 const UserModel = require('./models/user.model')
 const GameModel = require('./models/game.model')
 
-const { CheckAuthentication, HandleLogin, HandleRegistration } = require('./auth/auth-handler')
-const { RouteGenerator } = require('./node_modules/dynamic-route-generator/build')
-const { DynamicApiDocsPlugin } = require('./node_modules/dynamic-api-docs')
+const AuthHandler = require('./auth/auth-handler')
 
-const instantiateApplication = app => {
+const { RouteGenerator } = require('dynamic-route-generator')
+const { DynamicApiDocsPlugin } = require('dynamic-api-docs')
+
+const instantiateApplication = () => {
   mongoose.connect('mongodb://localhost/test')
 
   const routes = [
@@ -15,24 +18,24 @@ const instantiateApplication = app => {
       model: UserModel,
       methods: [{
         name: 'post',
-        handlers: [HandleLogin]
+        handlers: [AuthHandler.handleLogin]
       }]
     }, {
       uri: '/auth/register',
       model: UserModel,
       methods: [{
         name: 'post',
-        handlers: [HandleRegistration]
+        handlers: [AuthHandler.handleRegistration]
       }]
     }, {
       uri: '/games',
       model: GameModel,
       methods: [{
         name: 'get',
-        handlers: [CheckAuthentication]
+        handlers: [AuthHandler.checkAuthentication]
       }, {
         name: 'post',
-        handlers: [CheckAuthentication]
+        handlers: [AuthHandler.checkAuthentication]
       }]
     }
   ]
