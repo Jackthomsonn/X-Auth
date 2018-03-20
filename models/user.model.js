@@ -12,13 +12,11 @@ class UserSchema extends mongoose.Schema {
   }
 
   setupPreHooks() {
-    const that = this
+    const schema = this
 
     this.pre('save', function (next) {
-      const user = this
-
-      Utils.checkUsernameIsAvailable(that.getModel(), user).then(() => {
-        if (!user.isModified('password')) {
+      Utils.checkUsernameIsAvailable(schema.getModel(), this).then(() => {
+        if (!this.isModified('password')) {
           return next()
         }
 
@@ -27,30 +25,28 @@ class UserSchema extends mongoose.Schema {
             return next(err)
           }
 
-          bcrypt.hash(user.password, salt, function (err, hash) {
+          bcrypt.hash(this.password, salt, (err, hash) => {
             if (err) {
               return next(err)
             }
 
-            user.password = hash
+            this.password = hash
             next()
           })
         })
-      }).catch(error => {
-        return next(new Error(error))
-      })
+      }).catch(next)
     })
   }
 
   setupMethods() {
     this.methods = {
-      comparePassword: function (candidatePassword, cb) {
+      comparePassword: function (candidatePassword, next) {
         bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
           if (err) {
-            return cb(err)
+            return next(err)
           }
 
-          cb(null, isMatch)
+          next(null, isMatch)
         })
       }
     }

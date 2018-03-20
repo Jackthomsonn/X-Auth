@@ -3,11 +3,10 @@ const jwt = require('jsonwebtoken')
 const userModel = require('../models/user.model')
 
 class AuthHandler {
-  handleLogin(req, res) {
-    const username = req.body.username
-    const password = req.body.password
+  handleLogin(req, res, next) {
+    const { username, password } = req.body
 
-    userModel.findOne({ username: username }, (err, user) => {
+    userModel.findOne({ username }, (err, user) => {
       if (err) {
         return res.status(500).send({
           dev_message: 'internal server error',
@@ -25,11 +24,11 @@ class AuthHandler {
       } else {
         user.comparePassword(password, (err, isMatch) => {
           if (isMatch) {
-            res.cookie(env.COOKIE_NAME, jwt.sign({ user: user.username }, env.AUTH_SECRET_KEY), {
+            res.cookie(env.COOKIE_NAME, jwt.sign({ username }, env.AUTH_SECRET_KEY), {
               maxAge: 3600000
             })
 
-            return res.status(200).send()
+            res.status(200).send()
           } else {
             return res.status(404).send({
               dev_message: 'auth error',
@@ -62,7 +61,7 @@ class AuthHandler {
         if (err) {
           return res.status(403).send({
             message: 'Invalid Token',
-            reason: 'The token provided is not valid'
+            reason: 'Invalid token provided'
           })
         } else {
           next()
