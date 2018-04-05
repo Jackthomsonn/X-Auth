@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
-const env = require('../env')
+const env = require('../environment/env')
 
 const Utils = require('../utils')
 

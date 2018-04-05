@@ -1,6 +1,6 @@
-const env = require('../env')
+const env = require('../environment/env')
 const jwt = require('jsonwebtoken')
-const userModel = require('../models/user.model')
+const userModel = require('../models/user.model').getModel()
 
 /*
   Remove this when steps are completed

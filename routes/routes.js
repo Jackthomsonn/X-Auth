@@ -1,7 +1,7 @@
-const UserModel = require('./models/user.model').getModel()
-const GameModel = require('./models/game.model').getModel()
+const UserModel = require('../models/user.model').getModel()
+const GameModel = require('../models/game.model').getModel()
 
-const AuthHandler = require('./auth/auth-handler')
+const AuthHandler = require('../auth/auth-handler')
 
 const routes = [
   {
