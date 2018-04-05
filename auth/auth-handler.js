@@ -2,6 +2,12 @@ const env = require('../env')
 const jwt = require('jsonwebtoken')
 const userModel = require('../models/user.model')
 
+/*
+  Remove this when steps are completed
+  Line 29: Update
+  Line 48: Update
+*/
+
 class AuthHandler {
   handleLogin(req, res, next) {
     const { username, password } = req.body
@@ -10,7 +16,7 @@ class AuthHandler {
       if (err) {
         return res.status(500).send({
           dev_message: 'internal server error',
-          user_message: 'An internal server error was found',
+          user_message: 'An internal server error occurred',
           status: 500
         })
       }
@@ -60,8 +66,9 @@ class AuthHandler {
       jwt.verify(req.token, env.AUTH_SECRET_KEY, err => {
         if (err) {
           return res.status(403).send({
-            message: 'Invalid Token',
-            reason: 'Invalid token provided'
+            dev_message: 'invalid token',
+            user_message: 'Invalid token provided',
+            status: 403
           })
         } else {
           next()
@@ -69,8 +76,9 @@ class AuthHandler {
       })
     } else {
       res.status(403).send({
-        message: 'No Token',
-        reason: 'No token provided'
+        dev_message: 'no token',
+        user_message: 'No token provided',
+        status: 403
       })
     }
   }

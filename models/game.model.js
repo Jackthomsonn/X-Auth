@@ -19,4 +19,4 @@ module.exports = new GameSchema({
     required: true,
     type: String
   }
-}).getModel()
+})

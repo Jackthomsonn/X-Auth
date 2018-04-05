@@ -66,4 +66,4 @@ module.exports = new UserSchema({
     required: true,
     type: String
   }
-}).getModel()
+})
