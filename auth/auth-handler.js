@@ -4,8 +4,8 @@ const userModel = require('../models/user.model').getModel()
 
 /*
   Remove this when steps are completed
-  Line 29: Update
-  Line 48: Update
+  Line 33: Update
+  Line 51: Update
 */
 
 class AuthHandler {
