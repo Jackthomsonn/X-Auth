@@ -1,7 +1,6 @@
 const env = {
   SALT_WORK_FACTOR: undefined,
   COOKIE_NAME: undefined,
-  COOKIE_NAME_FORGOTTEN_PASSWORD: undefined,
   AUTH_SECRET_KEY: undefined,
   AUTH_SECRET_KEY_FORGOTTEN_PASSWORD: undefined,
   FORGOTTEN_PASSWORD_PAGE_URI: undefined,

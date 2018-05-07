@@ -27,9 +27,8 @@ class XAuth {
       !env.AUTH_SECRET_KEY ||
       !env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD ||
       !env.COOKIE_NAME ||
-      !env.COOKIE_NAME_FORGOTTEN_PASSWORD ||
       !env.DOMAIN_EMAIL ||
-      !env.FORGOTTEN_PASSWORD_PAGE_URL ||
+      !env.FORGOTTEN_PASSWORD_PAGE_URI ||
       !env.JWT_TOKEN_EXPIRATION ||
       !env.PORT ||
       !env.SALT_WORK_FACTOR,

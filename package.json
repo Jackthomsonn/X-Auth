@@ -1,6 +1,7 @@
 {
   "name": "x-auth",
   "version": "1.0.0",
+  "main": "x-auth.js",
   "author": "Jack Thomson",
   "license": "ISC",
   "dependencies": {

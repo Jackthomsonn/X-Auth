@@ -59,7 +59,11 @@ class AuthHandler {
     const { email } = req.body
 
     const getResetPasswordLink = () => {
-      return req.protocol + "://" + req.get('host') + '/' + env.FORGOTTEN_PASSWORD_PAGE_URL + '?' + email
+      const token = jwt.sign({ email }, env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD, {
+        expiresIn: env.JWT_TOKEN_EXPIRATION / 1000
+      })
+
+      return req.protocol + "://" + req.get('host') + '/' + env.FORGOTTEN_PASSWORD_PAGE_URI + '?' + email + '&' + token
     }
 
     userModel.findOne({ email }, (err, user) => {
@@ -96,13 +100,6 @@ class AuthHandler {
               status: 400
             })
           } else {
-            res.cookie(
-              env.COOKIE_NAME_FORGOTTEN_PASSWORD,
-              jwt.sign({ email }, env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD, {
-                expiresIn: env.JWT_TOKEN_EXPIRATION / 1000
-              }), {
-                maxAge: env.JWT_TOKEN_EXPIRATION
-              })
             res.status(200).send()
           }
         });
