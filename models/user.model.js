@@ -15,7 +15,7 @@ class UserSchema extends mongoose.Schema {
     const schema = this
 
     this.pre('save', function (next) {
-      Utils.checkUsernameIsAvailable(schema.getModel(), this).then(() => {
+      Utils.checkUsernameAndEmailIsAvailable(schema.getModel(), this).then(() => {
         if (!this.isModified('password')) {
           return next()
         }
@@ -48,6 +48,21 @@ class UserSchema extends mongoose.Schema {
 
           next(null, isMatch)
         })
+      },
+      resetPassword: function (candidatePassword, next) {
+        bcrypt.genSalt(env.SALT_WORK_FACTOR, (err, salt) => {
+          if (err) {
+            return next(err)
+          }
+
+          bcrypt.hash(candidatePassword, salt, (err, hash) => {
+            if (err) {
+              return next(err)
+            }
+
+            next(null, hash)
+          })
+        })
       }
     }
   }
@@ -60,10 +75,17 @@ class UserSchema extends mongoose.Schema {
 module.exports = new UserSchema({
   username: {
     required: true,
-    type: String
+    type: String,
+    unique: true
   },
   password: {
     required: true,
     type: String
+  },
+  email: {
+    require: true,
+    type: String,
+    unique: true,
+    validate: [Utils.validateEmail, 'The email address that was supplied was invalid'],
   }
 })
