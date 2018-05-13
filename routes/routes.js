@@ -1,4 +1,5 @@
 const UserModel = require('../models/user.model').getModel()
+const TwoFactorModel = require('../models/two-factor.model').getModel()
 
 const AuthHandler = require('../auth/auth-handler')
 
@@ -9,6 +10,20 @@ const routes = [
     methods: [{
       name: 'post',
       handlers: [AuthHandler.handleLogin]
+    }]
+  }, {
+    uri: '/auth/login/authenticate',
+    model: TwoFactorModel,
+    methods: [{
+      name: 'post',
+      handlers: [AuthHandler.handleTwoFactorAuthentication]
+    }]
+  }, {
+    uri: '/auth/verify',
+    model: UserModel,
+    methods: [{
+      name: 'get',
+      handlers: [AuthHandler.verifyEmail]
     }]
   }, {
     uri: '/auth/register',
@@ -22,7 +37,7 @@ const routes = [
     model: UserModel,
     methods: [{
       name: 'post',
-      handlers: [AuthHandler.initiatePasswordRequest]
+      handlers: [AuthHandler.initiatePasswordResetRequest]
     }]
   }, {
     uri: '/auth/update-password',

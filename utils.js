@@ -36,8 +36,31 @@ class Utils {
   }
 
   static validateEmail(email) {
-    var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
     return regex.test(email)
+  }
+
+  static validatePhoneNumber(phoneNumber) {
+    var regex = /^(?:\W*\d){11}\W*$/
+    return regex.test(phoneNumber)
+  }
+
+  static buildUrlQuery(req, url, queryParams) {
+    let queryUrl = req.protocol + "://" + req.get('host') + '/' + url
+
+    if (queryParams && queryParams.length) {
+      queryUrl += '?q='
+    }
+
+    queryParams.forEach((query, index) => {
+      if (index + 1 !== queryParams.length) {
+        queryUrl += query + '&'
+      } else {
+        queryUrl += query
+      }
+    })
+
+    return queryUrl
   }
 }
 

@@ -1,6 +1,8 @@
+const mongoose = require('mongoose')
 const routes = require('./routes/routes')
 const env = require('./environment/env')
-const mongoose = require('mongoose')
+
+const AuthHandler = require('./auth/auth-handler')
 
 class XAuth {
   static install(event) {
@@ -18,7 +20,11 @@ class XAuth {
     env.JWT_TOKEN_EXPIRATION = props.jwtTokenExpiration
     env.SALT_WORK_FACTOR = props.saltWorkFactor
     env.PORT = props.port
+    env.MODEL_EXTRA_PROPS = props.modelExtraProps
     env.DATABASE_URI = props.databaseUri
+    env.TEXT_MAGIC_USERNAME = props.textMagicUsername
+    env.TEXT_MAGIC_TOKEN = props.textMagicToken
+    env.VERIFICATION_PAGE_URI = props.verificationPageUri
   }
 
   apply(routeGenerator) {
@@ -29,9 +35,10 @@ class XAuth {
       !env.COOKIE_NAME ||
       !env.DOMAIN_EMAIL ||
       !env.FORGOTTEN_PASSWORD_PAGE_URI ||
+      !env.VERIFICATION_PAGE_URI ||
       !env.JWT_TOKEN_EXPIRATION ||
       !env.PORT ||
-      !env.SALT_WORK_FACTOR,
+      !env.SALT_WORK_FACTOR ||
       !env.DATABASE_URI
     ) {
       throw new Error('You must set all the required properties for XAuth to begin installing')
@@ -41,4 +48,7 @@ class XAuth {
   }
 }
 
-module.exports = XAuth
+module.exports = {
+  XAuth: XAuth,
+  CheckAuthentication: AuthHandler.checkAuthentication
+}
