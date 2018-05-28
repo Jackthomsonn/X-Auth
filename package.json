@@ -1,9 +1,19 @@
 {
-  "name": "x-auth",
+  "name": "x-auth-plugin",
   "version": "0.0.1-beta",
   "main": "x-auth.js",
   "author": "Jack Thomson",
   "license": "ISC",
+  "keywords": [
+    "dynamic",
+    "route",
+    "generator",
+    "authentication",
+    "plug",
+    "and",
+    "play",
+    "X Auth"
+  ],
   "scripts": {
     "publish-npm:beta": "npm publish --tag=next"
   },
