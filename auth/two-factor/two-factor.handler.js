@@ -3,7 +3,7 @@ const env = require('../../environment/env')
 const TokenHandler = require('../token/token.handler')
 
 class TwoFactorAuthenticationHandler {
-  constructor(req, res) {
+  static authenticate(req, res) {
     const { token } = req.body
     const username = req.query.q.split('=').pop()
 
@@ -27,7 +27,7 @@ class TwoFactorAuthenticationHandler {
       } else {
         if (user.twoFactorAuthToken === parseInt(token)) {
           res.cookie(env.COOKIE_NAME, TokenHandler.signToken(username, env.AUTH_SECRET_KEY, env.JWT_TOKEN_EXPIRATION), {
-            maxAge: 3600000
+            maxAge: env.JWT_TOKEN_EXPIRATION
           })
 
           return res.status(200).send({

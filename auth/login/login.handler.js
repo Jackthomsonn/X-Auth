@@ -3,7 +3,7 @@ const env = require('../../environment/env')
 const TokenHandler = require('../token/token.handler')
 
 class LoginHandler {
-  constructor(req, res) {
+  static login(req, res) {
     const { username, password } = req.body
 
     userModel.findOne({ username }, (err, user) => {
@@ -34,7 +34,7 @@ class LoginHandler {
         user.comparePassword(password, (err, isMatch) => {
           if (isMatch && !user.twoFactorAuthEnabled) {
             res.cookie(env.COOKIE_NAME, TokenHandler.signToken(username, env.AUTH_SECRET_KEY, env.JWT_TOKEN_EXPIRATION), {
-              maxAge: 3600000
+              maxAge: env.JWT_TOKEN_EXPIRATION
             })
 
             return res.status(200).send()

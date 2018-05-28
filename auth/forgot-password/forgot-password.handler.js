@@ -1,15 +1,15 @@
 const userModel = require('../../models/user.model').getModel()
 const sendmail = require('sendmail')()
 const env = require('../..//environment/env')
-const ms = require('ms')
 const utils = require('../../utils')
 const TokenHandler = require('../token/token.handler')
+const PasswordResetEmailTemplate = require('../../templates/password-reset')
 
 class ForgottenPasswordHandler {
   static initiatePasswordResetRequest(req, res) {
     const { email } = req.body
     const token = TokenHandler.signToken(email, env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD, env.JWT_TOKEN_EXPIRATION)
-    const url = utils.buildUrlQuery(req, env.FORGOTTEN_PASSWORD_PAGE_URI, [`email=${email}`, `${token}`])
+    const url = utils.buildUrlQuery(req, 'auth/forgotten-password', [`email=${email}`, `${token}`])
 
     userModel.findOne({ email }, (err, user) => {
       if (err) {
@@ -19,6 +19,14 @@ class ForgottenPasswordHandler {
           moreInformation: err,
           moreInformation: err,
           status: 500
+        })
+      }
+
+      if (!user.verified) {
+        return res.status(403).send({
+          dev_message: 'account not verified',
+          user_message: 'This account is not yet verified',
+          status: 404
         })
       }
 
@@ -33,12 +41,7 @@ class ForgottenPasswordHandler {
           from: env.DOMAIN_EMAIL,
           to: email,
           subject: env.APP_NAME + ' - Password reset request',
-          html: `
-            <strong>Password Reset Request for ${env.APP_NAME}</strong>
-            </br>
-            <p>A request has been made on your account to reset your password. If this was you, please click the following link ${url} (This link will expire in ${ms(env.JWT_TOKEN_EXPIRATION)})</p>
-            </br>
-            <p>If this request was not made by you, please ignore this email</p>`,
+          html: PasswordResetEmailTemplate(url),
         }, err => {
           if (err) {
             return res.status(400).send({
@@ -81,6 +84,15 @@ class ForgottenPasswordHandler {
               user_message: 'An internal server error occurred',
               moreInformation: err,
               status: 500
+            })
+          }
+
+          if (!utils.validatePassword(password)) {
+            return res.status(400).send({
+              dev_message: 'password criteria not met',
+              user_message: 'The password specified does not match the specified criteria',
+              moreInformation: err,
+              status: 400
             })
           }
 

@@ -1,8 +1,8 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const TextMagicClient = require('textmagic-rest-client')
-const { formatNumber } = require('libphonenumber-js')
 const env = require('../environment/env')
+const awesomePhonenumber = require("awesome-phonenumber")
 
 const event = require('../events')
 
@@ -29,6 +29,9 @@ class UserSchema extends mongoose.Schema {
             next(err)
           }
 
+          const pn = new awesomePhonenumber(this.phoneNumber, 'GB')
+          this.phoneNumber = pn.getNumber()
+
           bcrypt.hash(this.password, salt, (err, hash) => {
             if (err) {
               next(err)
@@ -47,12 +50,12 @@ class UserSchema extends mongoose.Schema {
   setupMethods() {
     this.methods = {
       comparePassword: function (candidatePassword, next) {
-        bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+        bcrypt.compare(candidatePassword, this.password, function (err, isValid) {
           if (err) {
             return next(err)
           }
 
-          next(null, isMatch)
+          next(null, isValid)
         })
       },
       resetPassword: function (candidatePassword, next) {
@@ -67,6 +70,31 @@ class UserSchema extends mongoose.Schema {
             }
 
             next(null, hash)
+          })
+        })
+      },
+      changePassword: function (oldPassword, newPassword, next) {
+        bcrypt.compare(oldPassword, this.password, function (err, isValid) {
+          if (err) {
+            return next(err)
+          }
+
+          if (!isValid) {
+            return next({ message: 'Your old password is wrong' })
+          }
+
+          bcrypt.genSalt(env.SALT_WORK_FACTOR, (err, salt) => {
+            if (err) {
+              return next(err)
+            }
+
+            bcrypt.hash(newPassword, salt, (err, hash) => {
+              if (err) {
+                return next(err)
+              }
+
+              next(null, hash)
+            })
           })
         })
       },
@@ -132,13 +160,13 @@ module.exports = new UserSchema({
     type: String
   },
   email: {
-    require: true,
+    required: true,
     type: String,
     unique: true,
     validate: [Utils.validateEmail, 'The email address that was supplied was invalid'],
   },
   phoneNumber: {
-    require: true,
+    required: true,
     type: String,
     validate: [Utils.validatePhoneNumber, 'The phone number that was supplied was invalid'],
   },

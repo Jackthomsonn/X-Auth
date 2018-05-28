@@ -3,48 +3,96 @@ const TwoFactorModel = require('../models/two-factor.model').getModel()
 
 const AuthHandler = require('../auth/auth-handler')
 
+const env = require('../environment/env')
+
 const routes = [
   {
-    uri: '/auth/login',
+    uri: '/auth/login', // Handles login at the API level
     model: UserModel,
     methods: [{
       name: 'post',
       handlers: [AuthHandler.handleLogin]
     }]
   }, {
-    uri: '/auth/login/authenticate',
+    uri: '/auth/login/authenticate', // Handles two factor login at the API level
     model: TwoFactorModel,
     methods: [{
       name: 'post',
       handlers: [AuthHandler.handleTwoFactorAuthentication]
     }]
   }, {
-    uri: '/auth/verify',
+    uri: '/auth/verify', // Handles verification from email
     model: UserModel,
     methods: [{
       name: 'get',
       handlers: [AuthHandler.verifyEmail]
     }]
   }, {
-    uri: '/auth/register',
+    uri: '/auth/register', // Handles registration at the API level
     model: UserModel,
     methods: [{
       name: 'post',
       handlers: [AuthHandler.handleRegistration]
     }]
   }, {
-    uri: '/auth/reset-password-request',
+    uri: '/auth/reset-password-request', // Handles reset password request at the API level
     model: UserModel,
     methods: [{
       name: 'post',
       handlers: [AuthHandler.initiatePasswordResetRequest]
     }]
   }, {
-    uri: '/auth/update-password',
+    uri: '/auth/update-password', // Handles update password at the API level
     model: UserModel,
     methods: [{
       name: 'post',
       handlers: [AuthHandler.checkAuthenticationForPasswordReset, AuthHandler.updatePassword]
+    }]
+  },
+  {
+    uri: '/auth/forgotten-password', // Handles at the VIEW level
+    model: UserModel,
+    methods: [{
+      name: 'get',
+      handlers: [(req, res) => {
+        let template = env.FORGOTTEN_PASSWORD_PAGE_TEMPLATE
+          ? env.FORGOTTEN_PASSWORD_PAGE_TEMPLATE
+          : require('../templates/forgotten-password')
+
+        template += `
+          <script>
+            const token = window.location.search.split('&')[1]
+            const email = window.location.search.split('q')[1].split('=')[2].split('&')[0]
+        
+            const button = document.querySelector('button')
+            document.querySelector('#email').value = email
+        
+            button.addEventListener('click', changePassword)
+        
+            function changePassword() {
+              fetch(window.location.protocol + 'update-password', {
+                body: JSON.stringify({
+                  email: email,
+                  password: document.querySelector('#password').value
+                }),
+                headers: {
+                  'authorization': token,
+                  'Content-Type': 'application/json'
+                },
+                method: 'POST'
+              })
+            }
+          </script>`
+        res.status(200).send(template)
+      }]
+    }]
+  },
+  {
+    uri: '/auth/change-password', // Handles change password at the API level
+    model: UserModel,
+    methods: [{
+      name: 'post',
+      handlers: [AuthHandler.changePassword]
     }]
   }
 ]

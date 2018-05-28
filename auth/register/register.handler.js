@@ -1,57 +1,57 @@
 const userModel = require('../../models/user.model').getModel()
 const event = require('../../events')
 const env = require('../../environment/env')
-const ms = require('ms')
 const sendmail = require('sendmail')()
 const utils = require('../../utils')
 const TokenHandler = require('../token/token.handler')
+const VerifyAccountEmailTemplate = require('../../templates/verify-account')
 
 class RegisterHandler {
   static handleRegistration(req, res, next) {
     const { username, password, email } = req.body
     const token = TokenHandler.signToken(email, env.AUTH_SECRET_KEY, env.JWT_TOKEN_EXPIRATION)
 
-    let called = false
-
-    if (!username || !password || !email) {
+    if (!utils.validatePassword(password)) {
       return res.status(400).send({
-        dev_message: 'missing fields',
-        user_message: 'Please make sure you supply all fields',
+        dev_message: 'password criteria not met',
+        user_message: 'The password specified does not match the specified criteria',
         status: 400
       })
     }
 
-    req.body.verificationToken = token
+    let called = false
 
-    next()
+    if (!env.EMAIL_VERIFICATION) {
+      req.body.verified = true
+      next()
+    } else {
+      req.body.verificationToken = token
+      next()
+      event.on('registration-complete', () => {
+        const url = utils.buildUrlQuery(req, 'auth/verify', [`email=${email}`, `${token}`])
 
-    event.on('registration-complete', () => {
-      const url = utils.buildUrlQuery(req, env.VERIFICATION_PAGE_URI, [`email=${email}`, `${token}`])
+        if (!called) {
+          sendmail({
+            from: env.DOMAIN_EMAIL,
+            to: email,
+            subject: env.APP_NAME + ' - Verify account',
+            html: VerifyAccountEmailTemplate(url)
+          }, err => {
+            if (err) {
+              return res.status(400).send({
+                dev_message: 'email account does not exist',
+                user_message: 'The email address on your account doesn\'t seem to exist',
+                status: 400
+              })
+            } else {
+              next(null)
+            }
+          })
 
-      if (!called) {
-        sendmail({
-          from: env.DOMAIN_EMAIL,
-          to: email,
-          subject: env.APP_NAME + ' - Verify account',
-          html: `
-          <p>Please verify your account by clicking on the following link ${url}</p>
-          
-          <p>(This link will expire in ${ms(env.JWT_TOKEN_EXPIRATION)})</p>`
-        }, err => {
-          if (err) {
-            return res.status(400).send({
-              dev_message: 'email account does not exist',
-              user_message: 'The email address on your account doesn\'t seem to exist',
-              status: 400
-            })
-          } else {
-            next(null)
-          }
-        })
-
-        called = !called
-      }
-    })
+          called = !called
+        }
+      })
+    }
   }
 
   static verifyEmail(req, res) {
@@ -85,7 +85,10 @@ class RegisterHandler {
                 status: 500
               })
             } else {
-              return res.status(200).send()
+              return res.status(200).send(env.VERIFICATION_PAGE_TEMPLATE
+                ? env.VERIFICATION_PAGE_TEMPLATE
+                : require('../../templates/account-verified')
+              )
             }
           })
         } else {

@@ -1,3 +1,5 @@
+const awesomePhonenumber = require('awesome-phonenumber')
+
 class Utils {
   static checkUsernameAndEmailIsAvailable(UserModel, user) {
     const { username, email } = user
@@ -40,13 +42,22 @@ class Utils {
     return regex.test(email)
   }
 
+  static validatePassword(password) {
+    if(password.length > 5) {
+      return true
+    }
+
+    return false
+  }
+
   static validatePhoneNumber(phoneNumber) {
-    var regex = /^(?:\W*\d){11}\W*$/
-    return regex.test(phoneNumber)
+    const pn = new awesomePhonenumber(phoneNumber, 'GB');
+    
+    return pn.isValid() && pn.isMobile()
   }
 
   static buildUrlQuery(req, url, queryParams) {
-    let queryUrl = req.protocol + "://" + req.get('host') + '/' + url
+    let queryUrl = req.protocol + '://' + req.get('host') + '/' + url
 
     if (queryParams && queryParams.length) {
       queryUrl += '?q='
