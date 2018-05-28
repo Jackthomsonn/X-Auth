@@ -1,6 +1,6 @@
 {
   "name": "x-auth-plugin",
-  "version": "0.0.1-beta",
+  "version": "0.0.2-beta",
   "main": "x-auth.js",
   "author": "Jack Thomson",
   "license": "ISC",
