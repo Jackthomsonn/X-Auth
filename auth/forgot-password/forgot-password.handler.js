@@ -17,7 +17,6 @@ class ForgottenPasswordHandler {
           dev_message: 'internal server error',
           user_message: 'An internal server error occurred',
           moreInformation: err,
-          moreInformation: err,
           status: 500
         })
       }
