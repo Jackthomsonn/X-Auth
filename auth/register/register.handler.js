@@ -45,10 +45,9 @@ class RegisterHandler {
               })
             } else {
               next(null)
+              called = !called
             }
           })
-
-          called = !called
         }
       })
     }

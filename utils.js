@@ -1,4 +1,5 @@
 const awesomePhonenumber = require('awesome-phonenumber')
+const env = require('./environment/env')
 
 class Utils {
   static checkUsernameAndEmailIsAvailable(UserModel, user) {
@@ -43,16 +44,21 @@ class Utils {
   }
 
   static validatePassword(password) {
-    if(password.length > 5) {
-      return true
+    const strongPassword = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})")
+    const veryStrongPassword = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
+    switch (env.PASSWORD_STRENGTH) {
+      case '0':
+        return strongPassword.test(password)
+        break;
+      case '1':
+        return veryStrongPassword.test(password)
+        break;
     }
-
-    return false
   }
 
   static validatePhoneNumber(phoneNumber) {
     const pn = new awesomePhonenumber(phoneNumber, 'GB');
-    
+
     return pn.isValid() && pn.isMobile()
   }
 

@@ -7,6 +7,8 @@ class TokenHandler {
     if (req.headers['authorization']) {
       req.token = req.headers['authorization']
 
+      req.token = req.token.split(' ')[1]
+
       jwt.verify(req.token, authToken, (err, token) => {
         if (err) {
           return res.status(403).send({

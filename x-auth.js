@@ -20,6 +20,7 @@ class XAuth {
     env.SALT_WORK_FACTOR = props.saltWorkFactor
     env.DATABASE_URI = props.databaseUri
     env.EMAIL_VERIFICATION = props.emailVerification
+    env.PASSWORD_STRENGTH = props.passwordStrength
 
     // Optionals
     env.TEXT_MAGIC_USERNAME = props.textMagicUsername
@@ -40,7 +41,8 @@ class XAuth {
       !env.JWT_TOKEN_EXPIRATION ||
       !env.SALT_WORK_FACTOR ||
       !env.DATABASE_URI ||
-      !env.EMAIL_VERIFICATION
+      !env.EMAIL_VERIFICATION ||
+      !env.PASSWORD_STRENGTH
     ) {
       throw new Error('You must set all the required properties for XAuth to begin installing')
     }

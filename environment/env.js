@@ -6,6 +6,7 @@ const env = {
   AUTH_SECRET_KEY: undefined,
   AUTH_SECRET_KEY_FORGOTTEN_PASSWORD: undefined,
   JWT_TOKEN_EXPIRATION: undefined,
+  PASSWORD_STRENGTH: undefined,
 
   // App specific details (Required)
   DOMAIN_EMAIL: undefined,

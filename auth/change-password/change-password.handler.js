@@ -1,8 +1,4 @@
 const userModel = require('../../models/user.model').getModel()
-const sendmail = require('sendmail')()
-const env = require('../..//environment/env')
-const utils = require('../../utils')
-const TokenHandler = require('../token/token.handler')
 
 class ChangePasswordHandler {
   static changePassword(req, res) {
