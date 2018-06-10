@@ -65,7 +65,7 @@ The api with the example above when run with node will be hosted on port 8080. T
 
 **/auth/login** - Used for the login process
 
-```json
+```js
 {
   "username": "admin",
   "password": "password"
@@ -78,7 +78,7 @@ For this, you must provide the username as a query param that you are trying to 
 
 `/auth/login/authenticate?q=username=admin`
 
-```json
+```js
 {
   "token": "5135"
 }
@@ -88,7 +88,7 @@ For this, you must provide the username as a query param that you are trying to 
 
 **/auth/register** - Used for the registration process
 
-```json
+```js
 {
   "username": "admin",
   "password": "password",
@@ -101,19 +101,19 @@ For this, you must provide the username as a query param that you are trying to 
 
 **/auth/reset-password-request** - Used for an initial reset password request
 
-```json
+```js
 {
   "email": "hello@email.com" // This will trigger an email to be sent to the user
 }
 ```
 
-***[Internal]*** **/auth/update-password** - Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+***[Internal]*** **/auth/forgotten-password** - Shows the forgotten password template from the reset-password-request email template
 
-***[Internal]*** **/auth/forgotten-password** - Handles the change of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+***[Internal]*** **/auth/update-password** - Handles the update of a password (Called internally by the forgotten password template)
 
 **/auth/change-password** - Used for changing a password
 
-```json
+```js
 {
   "email": "hello@email.com",
   "password": "password",
