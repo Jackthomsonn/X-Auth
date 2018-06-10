@@ -61,7 +61,7 @@ const routes = [
 
         template += `
           <script>
-            const token = window.location.search.split('&')[1]
+            const token = 'Bearer ' + window.location.search.split('&')[1]
             const email = window.location.search.split('q')[1].split('=')[2].split('&')[0]
         
             const button = document.querySelector('button')
