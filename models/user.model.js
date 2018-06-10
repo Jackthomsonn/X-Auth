@@ -80,7 +80,7 @@ class UserSchema extends mongoose.Schema {
           }
 
           if (!isValid) {
-            return next({ message: 'Your old password is wrong' })
+            return next({ user_message: 'Your old password is wrong' })
           }
 
           bcrypt.genSalt(env.SALT_WORK_FACTOR, (err, salt) => {

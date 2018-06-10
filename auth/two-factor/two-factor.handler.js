@@ -30,9 +30,7 @@ class TwoFactorAuthenticationHandler {
             maxAge: env.JWT_TOKEN_EXPIRATION
           })
 
-          return res.status(200).send({
-            message: 'Token Validated'
-          })
+          return res.status(200).send()
         } else {
           return res.status(403).send({
             dev_message: 'token not valid',
