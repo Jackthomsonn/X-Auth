@@ -1,7 +1,7 @@
 {
   "name": "x-auth-plugin",
   "description": "X-Auth is a plugin built for the Dynamic Route Generator that gives you a fully fledged login system for your web applications",
-  "version": "0.0.3-beta",
+  "version": "0.0.5",
   "main": "x-auth.js",
   "author": "Jack Thomson",
   "license": "ISC",
@@ -20,7 +20,8 @@
     "X Auth"
   ],
   "scripts": {
-    "publish-npm:beta": "npm publish --tag=next"
+    "publish-npm:beta": "npm publish --tag=next",
+    "publish-npm:latest": "npm publish --tag=latest"
   },
   "dependencies": {
     "awesome-phonenumber": "^2.2.5",
