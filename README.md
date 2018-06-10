@@ -73,6 +73,7 @@ The api with the example above when run with node will be hosted on port 8080. T
 ```
 
 **/auth/login/authenticate** - Handles two factor authentication
+
 For this, you must provide the username as a query param that you are trying to authenticate and the token is part of the POST request, for example:
 
 `/auth/login/authenticate?q=username=admin`
