@@ -59,3 +59,61 @@ new RouteGenerator({
 
 app.listen(process.env.PORT || 8080)
 ```
+
+## Access Api
+The api with the example above when run with node will be hosted on port 8080. The endpoints are as follows:
+
+**/auth/login** // Used for the login process
+
+```json
+{
+  "username": "admin",
+  "password": "password"
+}
+```
+
+**/auth/login/authenticate** // Handles two factor authentication
+`Example query: ?q=username=admin`
+
+```json
+{
+  "token": "5135"
+}
+```
+
+[Internal] **/auth/verify** // Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+
+**/auth/register** // Used for the registration process
+
+```json
+{
+  "username": "admin",
+  "password": "password",
+  "email": "hello@email.com",
+  "phoneNumber": "00112233445",
+  "twoFactorAuthEnabled": false // Optional,
+  "properties": {} // Custom properties you may want store for the user for example home address, age etc (Optional)
+}
+```
+
+**/auth/reset-password-request** // Used for an initial reset password request
+
+```json
+{
+  "email": "hello@email.com" // This will trigger an email to be sent to the user
+}
+```
+
+[Internal] **/auth/update-password** // Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+
+[Internal] **/auth/forgotten-password** // Handles the change of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+
+**/auth/change-password** // Used for changing a password
+
+```json
+{
+  "email": "hello@email.com",
+  "password": "password",
+  "newPassword": "Passw0rD"
+}
+```
