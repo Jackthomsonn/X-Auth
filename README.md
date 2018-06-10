@@ -63,7 +63,7 @@ app.listen(process.env.PORT || 8080)
 ## Access Api
 The api with the example above when run with node will be hosted on port 8080. The endpoints are as follows:
 
-**/auth/login** // Used for the login process
+**/auth/login** - Used for the login process
 
 ```json
 {
@@ -72,7 +72,7 @@ The api with the example above when run with node will be hosted on port 8080. T
 }
 ```
 
-**/auth/login/authenticate** // Handles two factor authentication
+**/auth/login/authenticate** - Handles two factor authentication
 `Example query: ?q=username=admin`
 
 ```json
@@ -81,9 +81,9 @@ The api with the example above when run with node will be hosted on port 8080. T
 }
 ```
 
-[Internal] **/auth/verify** // Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+[Internal] **/auth/verify** - Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
 
-**/auth/register** // Used for the registration process
+**/auth/register** - Used for the registration process
 
 ```json
 {
@@ -96,7 +96,7 @@ The api with the example above when run with node will be hosted on port 8080. T
 }
 ```
 
-**/auth/reset-password-request** // Used for an initial reset password request
+**/auth/reset-password-request** - Used for an initial reset password request
 
 ```json
 {
@@ -104,11 +104,11 @@ The api with the example above when run with node will be hosted on port 8080. T
 }
 ```
 
-[Internal] **/auth/update-password** // Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+[Internal] **/auth/update-password** - Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
 
-[Internal] **/auth/forgotten-password** // Handles the change of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+[Internal] **/auth/forgotten-password** - Handles the change of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
 
-**/auth/change-password** // Used for changing a password
+**/auth/change-password** - Used for changing a password
 
 ```json
 {
