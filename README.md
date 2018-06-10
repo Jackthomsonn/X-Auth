@@ -73,7 +73,9 @@ The api with the example above when run with node will be hosted on port 8080. T
 ```
 
 **/auth/login/authenticate** - Handles two factor authentication
-`Example query: ?q=username=admin`
+For this, you must provide the username as a query param that you are trying to authenticate and the token is part of the POST request, for example:
+
+`/auth/login/authenticate?q=username=admin`
 
 ```json
 {
@@ -81,7 +83,7 @@ The api with the example above when run with node will be hosted on port 8080. T
 }
 ```
 
-[Internal] **/auth/verify** - Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+***[Internal]*** **/auth/verify** - Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
 
 **/auth/register** - Used for the registration process
 
@@ -104,9 +106,9 @@ The api with the example above when run with node will be hosted on port 8080. T
 }
 ```
 
-[Internal] **/auth/update-password** - Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+***[Internal]*** **/auth/update-password** - Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
 
-[Internal] **/auth/forgotten-password** - Handles the change of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+***[Internal]*** **/auth/forgotten-password** - Handles the change of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
 
 **/auth/change-password** - Used for changing a password
 
