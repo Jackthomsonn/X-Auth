@@ -53,7 +53,7 @@ new RouteGenerator({
   }],
   app,
   plugins: {
-    pre: [XAuth]
+    pre: [XAuth],
     post: []
   }
 })
