@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const TextMagicClient = require('textmagic-rest-client')
 const env = require('../environment/env')
 const awesomePhonenumber = require("awesome-phonenumber")
+const TokenHandler = require('../auth/token/token.handler')
 
 const event = require('../events')
 
@@ -80,7 +81,7 @@ class UserSchema extends mongoose.Schema {
           }
 
           if (!isValid) {
-            return next({ user_message: 'Your old password is wrong' })
+            next({ user_message: 'Your old password is wrong' })
           }
 
           bcrypt.genSalt(env.SALT_WORK_FACTOR, (err, salt) => {
@@ -123,13 +124,17 @@ class UserSchema extends mongoose.Schema {
       twoFactorAuthCheck: function (user, username, phoneNumber, next) {
         const generatedToken = this.generateAuthToken()
 
-        user.findOneAndUpdate({ username }, { $set: { twoFactorAuthToken: generatedToken } }, err => {
+        user.findOneAndUpdate({ username }, {
+          $set: {
+            twoFactorAuthToken: TokenHandler.signToken(phoneNumber, generatedToken.toString(), 300000)
+          }
+        }, err => {
           if (err) {
             next(err)
           } else {
             var client = new TextMagicClient(env.TEXT_MAGIC_USERNAME, env.TEXT_MAGIC_TOKEN)
             client.Messages.send({
-              text: 'Your code is: ' + generatedToken,
+              text: 'Your code is: ' + generatedToken + ' - This code will expire in 5 minutes',
               phones: phoneNumber
             }, function (err) {
               if (err) {
@@ -174,7 +179,7 @@ module.exports = new UserSchema({
     type: Boolean
   },
   twoFactorAuthToken: {
-    type: Number
+    type: String
   },
   verified: {
     type: Boolean,

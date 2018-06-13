@@ -38,7 +38,8 @@ XAuth.setupProps({
   saltWorkFactor: 10,
   databaseUri: 'mongodb://localhost/test',
   themeColour: '#4096EE',
-  emailVerification: true
+  emailVerification: true,
+  passwordStrength: '1'
 })
 
 new RouteGenerator({

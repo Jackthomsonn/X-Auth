@@ -1,6 +1,7 @@
 const userModel = require('../../models/user.model').getModel()
 const env = require('../../environment/env')
 const TokenHandler = require('../token/token.handler')
+const jwt = require('jsonwebtoken')
 
 class TwoFactorAuthenticationHandler {
   static authenticate(req, res) {
@@ -25,19 +26,21 @@ class TwoFactorAuthenticationHandler {
           status: 500
         })
       } else {
-        if (user.twoFactorAuthToken === parseInt(token)) {
-          res.cookie(env.COOKIE_NAME, TokenHandler.signToken(username, env.AUTH_SECRET_KEY, env.JWT_TOKEN_EXPIRATION), {
-            maxAge: env.JWT_TOKEN_EXPIRATION
-          })
+        jwt.verify(user.twoFactorAuthToken, token, (err) => {
+          if (err) {
+            return res.status(403).send({
+              dev_message: 'token not valid',
+              user_message: 'The two factor auth token that was provided is not valid',
+              status: 403
+            })
+          } else {
+            res.cookie(env.COOKIE_NAME, TokenHandler.signToken(username, env.AUTH_SECRET_KEY, env.JWT_TOKEN_EXPIRATION), {
+              maxAge: env.JWT_TOKEN_EXPIRATION
+            })
 
-          return res.status(200).send()
-        } else {
-          return res.status(403).send({
-            dev_message: 'token not valid',
-            user_message: 'The two factor auth token that was provided is not valid',
-            status: 403
-          })
-        }
+            return res.status(200).send()
+          }
+        })
       }
     })
   }

@@ -31,20 +31,32 @@ class XAuth {
   }
 
   apply(routeGenerator) {
-    if (
-      !env.APP_NAME ||
-      !env.AUTH_SECRET_KEY ||
-      !env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD ||
-      !env.COOKIE_NAME ||
-      !env.COOKIE_NAME_FORGOTTEN_PASSWORD ||
-      !env.DOMAIN_EMAIL ||
-      !env.JWT_TOKEN_EXPIRATION ||
-      !env.SALT_WORK_FACTOR ||
-      !env.DATABASE_URI ||
-      !env.EMAIL_VERIFICATION ||
-      !env.PASSWORD_STRENGTH
-    ) {
-      throw new Error('You must set all the required properties for XAuth to begin installing')
+    try {
+      if (!env.APP_NAME) {
+        throw ('appName')
+      } else if (!env.AUTH_SECRET_KEY) {
+        throw ('authSecretKey')
+      } else if (!env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD) {
+        throw ('authSecretKeyForgottenPassword')
+      } else if (!env.COOKIE_NAME) {
+        throw ('cookieName')
+      } else if (!env.COOKIE_NAME_FORGOTTEN_PASSWORD) {
+        throw ('cookieNameForgottenPassword')
+      } else if (!env.DOMAIN_EMAIL) {
+        throw ('domainEmail')
+      } else if (!env.JWT_TOKEN_EXPIRATION) {
+        throw ('jwtTokenExpiration')
+      } else if (!env.SALT_WORK_FACTOR) {
+        throw ('saltWorkFactor')
+      } else if (!env.DATABASE_URI) {
+        throw ('databaseUri')
+      } else if (!env.EMAIL_VERIFICATION) {
+        throw ('emailVerification')
+      } else if (!env.PASSWORD_STRENGTH) {
+        throw ('passwordStrength')
+      }
+    } catch (property) {
+      throw new Error(`You must set all the required properties for XAuth to begin installing. Missing: ${property}`)
     }
     mongoose.connect(env.DATABASE_URI)
     routes.forEach(route => routeGenerator.routes.push(route))
