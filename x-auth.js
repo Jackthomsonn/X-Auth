@@ -50,7 +50,7 @@ class XAuth {
         throw ('saltWorkFactor')
       } else if (!env.DATABASE_URI) {
         throw ('databaseUri')
-      } else if (!env.EMAIL_VERIFICATION) {
+      } else if (!env.EMAIL_VERIFICATION.toString()) {
         throw ('emailVerification')
       } else if (!env.PASSWORD_STRENGTH) {
         throw ('passwordStrength')

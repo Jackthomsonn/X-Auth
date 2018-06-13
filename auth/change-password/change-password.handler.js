@@ -1,4 +1,5 @@
 const userModel = require('../../models/user.model').getModel()
+const utils = require('../../utils')
 
 class ChangePasswordHandler {
   static changePassword(req, res) {
@@ -11,6 +12,15 @@ class ChangePasswordHandler {
           user_message: 'An internal server error occurred',
           moreInformation: err,
           status: 500
+        })
+      }
+
+      if (!utils.validatePassword(newPassword)) {
+        return res.status(400).send({
+          dev_message: 'password criteria not met',
+          user_message: 'The password specified does not match the specified criteria',
+          moreInformation: err,
+          status: 400
         })
       }
 
