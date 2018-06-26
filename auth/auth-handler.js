@@ -7,8 +7,8 @@ const ForgottenPasswordHandler = require('./forgot-password/forgot-password.hand
 const ChangePasswordHandler = require('./change-password/change-password.handler')
 
 class AuthHandler {
-  handleLogin(req, res, next) {
-    LoginHandler.login(req, res, next)
+  handleLogin(req, res) {
+    LoginHandler.login(req, res)
   }
 
   handleTwoFactorAuthentication(req, res) {
