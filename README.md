@@ -31,15 +31,18 @@ XAuth.setupProps({
   appName: 'XAuth Test',
   authSecretKey: '12345',
   authSecretKeyForgottenPassword: '12345',
-  cookieName: 'xauth-test',
+  cookieName: 'xauth-access',
   cookieNameForgottenPassword: 'xauth-forgotten-password-test',
   domainEmail: 'hello@email.com',
-  jwtTokenExpiration: 300000, // 5 minutes (Applied to cookie expiration also)
+  jwtTokenExpiration: 300000, // 5 minutes (Applied to maxAge for cookieName cookie internally)
   saltWorkFactor: 10,
   databaseUri: 'mongodb://localhost/test',
   themeColour: '#4096EE',
   emailVerification: true,
-  passwordStrength: '1'
+  passwordStrength: '1',
+  refreshTokenExpiration: 3600000, // 1 hour (Applied to maxAge for refreshTokenCookieName cookie internally)
+  refreshTokenSecretKey: '54321',
+  refreshTokenCookieName: 'x-auth-refresh'
 })
 
 new RouteGenerator({
@@ -65,6 +68,7 @@ app.listen(process.env.PORT || 8080)
 The api with the example above when run with node will be hosted on port 8080. The endpoints are as follows:
 
 **/auth/login** - Used for the login process
+(When a user logs in, an access token and refresh token are set as cookies. Your application will need to get the values from these cookies and send them with every request. Make sure you are using an SSL encryption otherwise these values will be transferred over the wire in plain text, SSL will make sure to serialize the values so if anyone is sniffing the traffic, it will make it a lot harder for them to gain access to your account)
 
 ```js
 {
