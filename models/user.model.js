@@ -4,10 +4,9 @@ const TextMagicClient = require('textmagic-rest-client')
 const env = require('../environment/env')
 const awesomePhonenumber = require("awesome-phonenumber")
 const TokenHandler = require('../auth/token/token.handler')
+const utils = require('../utils')
 
 const event = require('../events')
-
-const Utils = require('../utils')
 
 class UserSchema extends mongoose.Schema {
   constructor(definition) {
@@ -20,7 +19,7 @@ class UserSchema extends mongoose.Schema {
     const schema = this
 
     this.pre('save', function (next) {
-      Utils.checkUsernameAndEmailIsAvailable(schema.getModel(), this).then(() => {
+      utils.checkUsernameAndEmailIsAvailable(schema.getModel(), this).then(() => {
         if (!this.isModified('password')) {
           next(null)
         }
@@ -121,29 +120,35 @@ class UserSchema extends mongoose.Schema {
       generateAuthToken() {
         return Math.floor(1000 + Math.random() * 9000)
       },
-      twoFactorAuthCheck: function (user, username, phoneNumber, next) {
+      twoFactorAuthCheck: function (user, dataObj, phoneNumber, next) {
+        const username = dataObj.username
         const generatedToken = this.generateAuthToken()
+        let data = undefined
 
-        user.findOneAndUpdate({ username }, {
-          $set: {
-            twoFactorAuthToken: TokenHandler.signToken(phoneNumber, generatedToken.toString(), 300000)
-          }
-        }, err => {
-          if (err) {
-            next(err)
-          } else {
-            var client = new TextMagicClient(env.TEXT_MAGIC_USERNAME, env.TEXT_MAGIC_TOKEN)
-            client.Messages.send({
-              text: 'Your code is: ' + generatedToken + ' - This code will expire in 5 minutes',
-              phones: phoneNumber
-            }, function (err) {
-              if (err) {
-                next(err)
-              } else {
-                next()
-              }
-            })
-          }
+        user.findOne({ username }, (err, newUser) => {
+          data = utils.buildDataModelForJwt(newUser)
+
+          user.findOneAndUpdate({ username }, {
+            $set: {
+              twoFactorAuthToken: TokenHandler.signToken(data, generatedToken.toString(), 300000)
+            }
+          }, err => {
+            if (err) {
+              next(err)
+            } else {
+              var client = new TextMagicClient(env.TEXT_MAGIC_USERNAME, env.TEXT_MAGIC_TOKEN)
+              client.Messages.send({
+                text: 'Your code is: ' + generatedToken + ' - This code will expire in 5 minutes',
+                phones: phoneNumber
+              }, function (err) {
+                if (err) {
+                  next(err)
+                } else {
+                  next()
+                }
+              })
+            }
+          })
         })
       }
     }
@@ -168,12 +173,12 @@ module.exports = new UserSchema({
     required: true,
     type: String,
     unique: true,
-    validate: [Utils.validateEmail, 'The email address that was supplied was invalid'],
+    validate: [utils.validateEmail, 'The email address that was supplied was invalid'],
   },
   phoneNumber: {
     required: true,
     type: String,
-    validate: [Utils.validatePhoneNumber, 'The phone number that was supplied was invalid'],
+    validate: [utils.validatePhoneNumber, 'The phone number that was supplied was invalid'],
   },
   twoFactorAuthEnabled: {
     type: Boolean
@@ -188,5 +193,6 @@ module.exports = new UserSchema({
   verificationToken: {
     type: String
   },
+  permissions: [mongoose.Schema.Types.Mixed],
   properties: [mongoose.Schema.Types.Mixed]
 })

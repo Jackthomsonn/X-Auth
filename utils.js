@@ -1,5 +1,6 @@
 const awesomePhonenumber = require('awesome-phonenumber')
 const env = require('./environment/env')
+const refreshTokenModel = require('./models/refresh-token.model').getModel()
 
 class Utils {
   static checkUsernameAndEmailIsAvailable(UserModel, user) {
@@ -78,6 +79,43 @@ class Utils {
     })
 
     return queryUrl
+  }
+
+  static buildDataModelForJwt(user) {
+    const model = {
+      username: user.username ? user.username : undefined,
+      permissions: user.permissions ? user.permissions : []
+    }
+
+    return model
+  }
+
+  static setRefreshToken(username, res) {
+    const refreshToken = require('./auth/token/token.handler').signToken({}, env.REFRESH_TOKEN_SECRET_KEY, env.REFRESH_TOKEN_EXPIRATION)
+
+    res.cookie(env.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+      maxAge: env.REFRESH_TOKEN_EXPIRATION
+    })
+
+    try {
+      refreshTokenModel.collection.updateOne({ username: username }, {
+        $set: {
+          username: username,
+          refreshToken: refreshToken,
+          status: 'AUTHENTICATED'
+        }
+      }, { upsert: true })
+    } catch(error) {
+      console.log(error)
+    }
+  }
+
+  static setAccessToken(data, res) {
+    const accessToken = require('./auth/token/token.handler').signToken(data, env.AUTH_SECRET_KEY, env.JWT_TOKEN_EXPIRATION)
+
+    res.cookie(env.COOKIE_NAME, accessToken, {
+      maxAge: env.JWT_TOKEN_EXPIRATION
+    })
   }
 }
 

@@ -8,10 +8,12 @@ const PasswordResetEmailTemplate = require('../../templates/password-reset')
 class ForgottenPasswordHandler {
   static initiatePasswordResetRequest(req, res) {
     const { email } = req.body
-    const token = TokenHandler.signToken(email, env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD, env.JWT_TOKEN_EXPIRATION)
-    const url = utils.buildUrlQuery(req, 'auth/forgotten-password', [`email=${email}`, `${token}`])
 
     userModel.findOne({ email }, (err, user) => {
+      const data = utils.buildDataModelForJwt(user)
+      const token = TokenHandler.signToken(data, env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD, env.JWT_TOKEN_EXPIRATION)
+      const url = utils.buildUrlQuery(req, 'auth/forgotten-password', [`email=${email}`, `${token}`])
+
       if (err) {
         return res.status(500).send({
           dev_message: 'internal server error',

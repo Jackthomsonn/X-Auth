@@ -1,5 +1,4 @@
 const env = require('../environment/env')
-
 const TokenHandler = require('./token/token.handler')
 const LoginHandler = require('./login/login.handler')
 const RegisterHandler = require('./register/register.handler')
@@ -8,8 +7,8 @@ const ForgottenPasswordHandler = require('./forgot-password/forgot-password.hand
 const ChangePasswordHandler = require('./change-password/change-password.handler')
 
 class AuthHandler {
-  handleLogin(req, res) {
-    LoginHandler.login(req, res)
+  handleLogin(req, res, next) {
+    LoginHandler.login(req, res, next)
   }
 
   handleTwoFactorAuthentication(req, res) {
@@ -37,11 +36,11 @@ class AuthHandler {
   }
 
   checkAuthentication(req, res, next) {
-    TokenHandler.verifyToken(env.AUTH_SECRET_KEY, true, req, res, next)
+    TokenHandler.verifyToken(env.AUTH_SECRET_KEY, req, res, next)
   }
 
   checkAuthenticationForPasswordReset(req, res, next) {
-    TokenHandler.verifyToken(env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD, false, req, res, next)
+    TokenHandler.verifyToken(env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD, req, res, next)
   }
 }
 

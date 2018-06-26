@@ -1,6 +1,5 @@
 const userModel = require('../../models/user.model').getModel()
-const env = require('../../environment/env')
-const TokenHandler = require('../token/token.handler')
+const utils = require('../../utils')
 
 class LoginHandler {
   static login(req, res) {
@@ -32,14 +31,16 @@ class LoginHandler {
         }
 
         user.comparePassword(password, (err, isMatch) => {
+          const data = utils.buildDataModelForJwt(user)
+          const { username } = data
+
           if (isMatch && !user.twoFactorAuthEnabled) {
-            res.cookie(env.COOKIE_NAME, TokenHandler.signToken(username, env.AUTH_SECRET_KEY, env.JWT_TOKEN_EXPIRATION), {
-              maxAge: env.JWT_TOKEN_EXPIRATION
-            })
+            utils.setAccessToken(data, res)
+            utils.setRefreshToken(username, res)
 
             return res.status(200).send()
           } else if (isMatch && user.twoFactorAuthEnabled) {
-            user.twoFactorAuthCheck(userModel, username, user.phoneNumber, err => {
+            user.twoFactorAuthCheck(userModel, data, user.phoneNumber, err => {
               if (err) {
                 return res.status(500).send({
                   dev_message: 'internal server error',

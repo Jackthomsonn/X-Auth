@@ -1,6 +1,5 @@
 const userModel = require('../../models/user.model').getModel()
-const env = require('../../environment/env')
-const TokenHandler = require('../token/token.handler')
+const utils = require('../../utils')
 const jwt = require('jsonwebtoken')
 
 class TwoFactorAuthenticationHandler {
@@ -9,7 +8,7 @@ class TwoFactorAuthenticationHandler {
     const username = req.query.q.split('=').pop()
 
     userModel.findOne({ username }, (err, user) => {
-      if (!user.twoFactorAuthEnabled) {
+      if (user && !user.twoFactorAuthEnabled) {
         return res.status(500).send({
           dev_message: 'two factor auth not enabled',
           user_message: 'Two factor authentication is not enabled on this account',
@@ -34,9 +33,11 @@ class TwoFactorAuthenticationHandler {
               status: 403
             })
           } else {
-            res.cookie(env.COOKIE_NAME, TokenHandler.signToken(username, env.AUTH_SECRET_KEY, env.JWT_TOKEN_EXPIRATION), {
-              maxAge: env.JWT_TOKEN_EXPIRATION
-            })
+            const data = utils.buildDataModelForJwt(user)
+            const { username } = data
+
+            utils.setAccessToken(data, res)
+            utils.setRefreshToken(username, res)
 
             return res.status(200).send()
           }

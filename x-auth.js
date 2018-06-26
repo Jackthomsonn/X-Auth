@@ -21,6 +21,9 @@ class XAuth {
     env.DATABASE_URI = props.databaseUri
     env.EMAIL_VERIFICATION = props.emailVerification
     env.PASSWORD_STRENGTH = props.passwordStrength
+    env.REFRESH_TOKEN_EXPIRATION = props.refreshTokenExpiration
+    env.REFRESH_TOKEN_SECRET_KEY = props.refreshTokenSecretKey,
+      env.REFRESH_TOKEN_COOKIE_NAME = props.refreshTokenCookieName
 
     // Optionals
     env.TEXT_MAGIC_USERNAME = props.textMagicUsername
@@ -54,9 +57,21 @@ class XAuth {
         throw ('emailVerification')
       } else if (!env.PASSWORD_STRENGTH) {
         throw ('passwordStrength')
+      } else if (!env.REFRESH_TOKEN_EXPIRATION) {
+        throw ('refreshTokenExpiration')
+      } else if (env.REFRESH_TOKEN_EXPIRATION < env.JWT_TOKEN_EXPIRATION) {
+        throw ('refreshTokenExpirationInvalid')
+      } else if (!env.REFRESH_TOKEN_SECRET_KEY) {
+        throw ('refreshTokenSecretKey')
+      } else if (!env.REFRESH_TOKEN_COOKIE_NAME) {
+        throw ('refreshTokenCookieName')
       }
     } catch (property) {
-      throw new Error(`You must set all the required properties for XAuth to begin installing. Missing: ${property}`)
+      if (property === 'refreshTokenExpirationInvalid') {
+        throw new Error(`Your refreshToken must have a greater expiration time than your jwtTokenExpiration`)
+      } else {
+        throw new Error(`You must set all the required properties for XAuth to begin installing. Missing: ${property}`)
+      }
     }
     mongoose.connect(env.DATABASE_URI)
     routes.forEach(route => routeGenerator.routes.push(route))
