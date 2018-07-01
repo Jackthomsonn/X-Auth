@@ -22,8 +22,8 @@ class XAuth {
     env.EMAIL_VERIFICATION = props.emailVerification
     env.PASSWORD_STRENGTH = props.passwordStrength
     env.REFRESH_TOKEN_EXPIRATION = props.refreshTokenExpiration
-    env.REFRESH_TOKEN_SECRET_KEY = props.refreshTokenSecretKey,
-      env.REFRESH_TOKEN_COOKIE_NAME = props.refreshTokenCookieName
+    env.REFRESH_TOKEN_SECRET_KEY = props.refreshTokenSecretKey
+    env.REFRESH_TOKEN_COOKIE_NAME = props.refreshTokenCookieName
 
     // Optionals
     env.TEXT_MAGIC_USERNAME = props.textMagicUsername
