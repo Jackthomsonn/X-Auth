@@ -27,7 +27,7 @@ class ForgottenPasswordHandler {
         return res.status(403).send({
           dev_message: 'account not verified',
           user_message: 'This account is not yet verified',
-          status: 404
+          status: 403
         })
       }
 

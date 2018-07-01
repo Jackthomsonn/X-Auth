@@ -90,7 +90,7 @@ For this, you must provide the username as a query param that you are trying to 
 }
 ```
 
-***[Internal]*** **/auth/verify** - Handles the update of a password (This is handled for you from the email template. If you provide your own email template, X-Auth will inject the required code to suffice the request)
+***[Internal]*** **/auth/verify** - Handles the update of a password (This is handled for you from the email template. If you provide your own verification page template [env.VERIFICATION_PAGE_TEMPLATE], X-Auth will inject the required code to suffice the request)
 
 **/auth/register** - Used for the registration process
 
@@ -113,7 +113,7 @@ For this, you must provide the username as a query param that you are trying to 
 }
 ```
 
-***[Internal]*** **/auth/forgotten-password** - Shows the forgotten password template from the reset-password-request email template
+***[Internal]*** **/auth/forgotten-password** - Shows the forgotten password template from the reset-password-request email template (If you provide your own forgotten password template [env.FORGOTTEN_PASSWORD_PAGE_TEMPLATE], X-Auth will inject the required code to suffice the request)
 
 ***[Internal]*** **/auth/update-password** - Handles the update of a password (Called internally by the forgotten password template)
 

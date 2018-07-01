@@ -33,10 +33,10 @@ class TokenHandler {
     }
   }
 
-  static refreshToken(accessToken, refreshToken, res, next) {
+  static refreshToken(accessToken, refreshToke, res, next) {
     const { username } = jwt.decode(accessToken).data ? jwt.decode(accessToken).data : {}
 
-    jwt.verify(refreshToken, env.REFRESH_TOKEN_SECRET_KEY, (err) => {
+    jwt.verify(refreshToke, env.REFRESH_TOKEN_SECRET_KEY, (err) => {
       if (err) {
         return res.status(403).send({
           dev_message: 'invalid refresh token',
@@ -55,9 +55,9 @@ class TokenHandler {
               status: 500
             })
           } else {
-            const { status, username } = doc ? doc : {};
+            const { status, username, refreshToken } = doc ? doc : {};
 
-            if (status === 'AUTHENTICATED') {
+            if (status === 'AUTHENTICATED' && refreshToke === refreshToken) {
               const userModel = require('../../models/user.model').getModel()
 
               userModel.findOne({ username }, (err, user) => {

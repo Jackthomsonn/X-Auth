@@ -81,21 +81,21 @@ class UserSchema extends mongoose.Schema {
 
           if (!isValid) {
             next({ user_message: 'Your old password is wrong' })
-          }
-
-          bcrypt.genSalt(env.SALT_WORK_FACTOR, (err, salt) => {
-            if (err) {
-              return next(err)
-            }
-
-            bcrypt.hash(newPassword, salt, (err, hash) => {
+          } else {
+            bcrypt.genSalt(env.SALT_WORK_FACTOR, (err, salt) => {
               if (err) {
                 return next(err)
               }
 
-              next(null, hash)
+              bcrypt.hash(newPassword, salt, (err, hash) => {
+                if (err) {
+                  return next(err)
+                }
+
+                next(null, hash)
+              })
             })
-          })
+          }
         })
       },
       verifyAccount: function (user, email, next) {
