@@ -6,7 +6,7 @@ const refreshTokenModel = require('../../models/refresh-token.model').getModel()
 const { InternalServerError, Unauthorized, Forbidden } = require('dynamic-route-generator')
 
 class TokenHandler {
-  static verifyToken(authKey, req, res, next) {
+  static verifyToken(authKey, req, _res, next) {
     if (req.headers['authorization']) {
       const accessToken = req.headers['authorization'].split(' ')[1]
 

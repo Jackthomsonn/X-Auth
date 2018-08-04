@@ -16,12 +16,16 @@ class ForgottenPasswordHandler {
     }
 
     userModel.findOne({ email }, (err, user) => {
+      if (err) {
+        return next(new InternalServerError(err))
+      }
+
       if (!user) {
         next(new BadRequest('A user with that email does not exist'))
       } else {
         const data = utils.buildDataModelForJwt(user)
         const token = TokenHandler.signToken(data, env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD, env.JWT_TOKEN_EXPIRATION)
-        const url = utils.buildUrlQuery(req, 'auth/forgotten-password', [`email=${email}`, `${token}`])
+        const url = utils.buildUrlQuery(req, 'auth/forgotten-password', [`email=${email}`, `token=${token}`])
 
         if (!user.verified) {
           next(new BadRequest('This account is not yet verified. Please check your emails and verify your account'))
@@ -55,7 +59,7 @@ class ForgottenPasswordHandler {
         return next(new InternalServerError())
       }
 
-      if(!password) {
+      if (!password) {
         return next(new BadRequest('You must supply a new password'))
       }
 
