@@ -1,5 +1,6 @@
 const UserModel = require('../models/user.model').getModel()
 const TwoFactorModel = require('../models/two-factor.model').getModel()
+const RefreshTokenModel = require('../models/refresh-token.model').getModel()
 
 const AuthHandler = require('../auth/auth-handler')
 
@@ -50,11 +51,19 @@ const routes = [
     }]
   },
   {
+    uri: '/auth/refreshtoken', // Gets a refresh token
+    model: RefreshTokenModel,
+    methods: [{
+      name: 'post',
+      handlers: [AuthHandler.getRefreshToken]
+    }]
+  },
+  {
     uri: '/auth/forgotten-password', // Handles at the VIEW level
     model: UserModel,
     methods: [{
       name: 'get',
-      handlers: [(req, res) => {
+      handlers: [(req, res, next) => {
         let template = env.FORGOTTEN_PASSWORD_PAGE_TEMPLATE
           ? env.FORGOTTEN_PASSWORD_PAGE_TEMPLATE
           : require('../templates/forgotten-password')
@@ -83,7 +92,7 @@ const routes = [
               })
             }
           </script>`
-        res.status(200).send(template)
+          next()
       }]
     }]
   },

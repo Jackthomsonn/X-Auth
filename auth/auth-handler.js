@@ -7,32 +7,32 @@ const ForgottenPasswordHandler = require('./forgot-password/forgot-password.hand
 const ChangePasswordHandler = require('./change-password/change-password.handler')
 
 class AuthHandler {
-  handleLogin(req, res) {
-    LoginHandler.login(req, res)
+  handleLogin(req, res, next) {
+    LoginHandler.login(req, res, next)
   }
 
-  handleTwoFactorAuthentication(req, res) {
-    TwoFactorAuthenticationHandler.authenticate(req, res)
+  handleTwoFactorAuthentication(req, res, next) {
+    TwoFactorAuthenticationHandler.authenticate(req, res, next)
   }
 
   handleRegistration(req, res, next) {
     RegisterHandler.handleRegistration(req, res, next)
   }
 
-  verifyEmail(req, res) {
-    RegisterHandler.verifyEmail(req, res)
+  verifyEmail(req, res, next) {
+    RegisterHandler.verifyEmail(req, res, next)
   }
 
-  initiatePasswordResetRequest(req, res) {
-    ForgottenPasswordHandler.initiatePasswordResetRequest(req, res)
+  initiatePasswordResetRequest(req, res, next) {
+    ForgottenPasswordHandler.initiatePasswordResetRequest(req, res, next)
   }
 
-  updatePassword(req, res) {
-    ForgottenPasswordHandler.updatePassword(req, res)
+  updatePassword(req, res, next) {
+    ForgottenPasswordHandler.updatePassword(req, res, next)
   }
 
-  changePassword(req, res) {
-    ChangePasswordHandler.changePassword(req, res)
+  changePassword(req, res, next) {
+    ChangePasswordHandler.changePassword(req, res, next)
   }
 
   checkAuthentication(req, res, next) {
@@ -41,6 +41,10 @@ class AuthHandler {
 
   checkAuthenticationForPasswordReset(req, res, next) {
     TokenHandler.verifyToken(env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD, req, res, next)
+  }
+
+  getRefreshToken(req, res, next) {
+    TokenHandler.getRefreshToken(req.body.token, res, next)
   }
 }
 

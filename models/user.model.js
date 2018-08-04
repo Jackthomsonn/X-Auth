@@ -8,6 +8,8 @@ const utils = require('../utils')
 
 const event = require('../events')
 
+const { InternalServerError, BadRequest } = require('dynamic-route-generator')
+
 class UserSchema extends mongoose.Schema {
   constructor(definition) {
     super(definition)
@@ -21,12 +23,12 @@ class UserSchema extends mongoose.Schema {
     this.pre('save', function (next) {
       utils.checkUsernameAndEmailIsAvailable(schema.getModel(), this).then(() => {
         if (!this.isModified('password')) {
-          next(null)
+          return next()
         }
 
         bcrypt.genSalt(env.SALT_WORK_FACTOR, (err, salt) => {
           if (err) {
-            next(err)
+            return next(err)
           }
 
           const pn = new awesomePhonenumber(this.phoneNumber, 'GB')
@@ -39,11 +41,13 @@ class UserSchema extends mongoose.Schema {
               this.password = hash
 
               event.emit('registration-complete')
-              next(null)
+              return next()
             }
           })
         })
-      }).catch(next)
+      }).catch((err) => {
+        next(new BadRequest(err))
+      })
     })
   }
 
@@ -80,7 +84,7 @@ class UserSchema extends mongoose.Schema {
           }
 
           if (!isValid) {
-            next({ user_message: 'Your old password is wrong' })
+            next(new BadRequest('Your old password is wrong'))
           } else {
             bcrypt.genSalt(env.SALT_WORK_FACTOR, (err, salt) => {
               if (err) {
@@ -106,12 +110,7 @@ class UserSchema extends mongoose.Schema {
           }
         }, err => {
           if (err) {
-            return res.status(500).send({
-              dev_message: 'internal server error',
-              user_message: 'An internal server error occurred',
-              moreInformation: err,
-              status: 500
-            })
+            next(new InternalServerError())
           } else {
             next(null)
           }
@@ -172,13 +171,11 @@ module.exports = new UserSchema({
   email: {
     required: true,
     type: String,
-    unique: true,
-    validate: [utils.validateEmail, 'The email address that was supplied was invalid'],
+    unique: true
   },
   phoneNumber: {
     required: true,
-    type: String,
-    validate: [utils.validatePhoneNumber, 'The phone number that was supplied was invalid'],
+    type: String
   },
   twoFactorAuthEnabled: {
     type: Boolean
@@ -194,5 +191,8 @@ module.exports = new UserSchema({
     type: String
   },
   permissions: [mongoose.Schema.Types.Mixed],
-  properties: [mongoose.Schema.Types.Mixed]
+  properties: {
+    required: false,
+    type: Object
+  }
 })

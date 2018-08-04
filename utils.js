@@ -2,6 +2,8 @@ const awesomePhonenumber = require('awesome-phonenumber')
 const env = require('./environment/env')
 const refreshTokenModel = require('./models/refresh-token.model').getModel()
 
+const { InternalServerError, Forbidden, BadRequest } = require('dynamic-route-generator')
+
 class Utils {
   static checkUsernameAndEmailIsAvailable(UserModel, user) {
     const { username, email } = user
@@ -10,21 +12,21 @@ class Utils {
       UserModel.findOne({ username }, (err, user) => {
         try {
           if (err) {
-            throw new Error(err)
+            throw new InternalServerError()
           }
 
           if (user) {
-            throw new Error('A user with that username already exists')
+            throw new BadRequest('A user with that username already exists')
           }
 
           UserModel.findOne({ email }, (err, email) => {
             try {
               if (err) {
-                throw new Error(err)
+                throw new InternalServerError()
               }
 
               if (email) {
-                throw new Error('A user with that email already exists')
+                throw new BadRequest('A user with that email already exists')
               }
 
               resolve()
@@ -84,7 +86,8 @@ class Utils {
   static buildDataModelForJwt(user) {
     const model = {
       username: user.username ? user.username : undefined,
-      permissions: user.permissions ? user.permissions : []
+      permissions: user.permissions ? user.permissions : [],
+      properties: user.properties ? user.properties : {}
     }
 
     return model
@@ -92,10 +95,6 @@ class Utils {
 
   static setRefreshToken(username, res) {
     const refreshToken = require('./auth/token/token.handler').signToken({}, env.REFRESH_TOKEN_SECRET_KEY, env.REFRESH_TOKEN_EXPIRATION)
-
-    res.cookie(env.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
-      maxAge: env.REFRESH_TOKEN_EXPIRATION
-    })
 
     try {
       refreshTokenModel.collection.updateOne({ username: username }, {

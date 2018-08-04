@@ -17,6 +17,7 @@ const env = {
   DATABASE_URI: undefined,
   THEME_COLOUR: undefined,
   EMAIL_VERIFICATION: undefined,
+  BASE_URI: undefined,
 
   // Text messaging client (two factor auth enabled account only / By default, two factor is not set) (Optional)
   TEXT_MAGIC_USERNAME: undefined,

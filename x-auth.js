@@ -20,6 +20,7 @@ class XAuth {
     env.SALT_WORK_FACTOR = props.saltWorkFactor
     env.DATABASE_URI = props.databaseUri
     env.EMAIL_VERIFICATION = props.emailVerification
+    env.BASE_URI = props.baseUri
     env.PASSWORD_STRENGTH = props.passwordStrength
     env.REFRESH_TOKEN_EXPIRATION = props.refreshTokenExpiration
     env.REFRESH_TOKEN_SECRET_KEY = props.refreshTokenSecretKey
@@ -55,6 +56,8 @@ class XAuth {
         throw ('databaseUri')
       } else if (!env.EMAIL_VERIFICATION.toString()) {
         throw ('emailVerification')
+      } else if (!env.BASE_URI) {
+        throw ('baseUri')
       } else if (!env.PASSWORD_STRENGTH) {
         throw ('passwordStrength')
       } else if (!env.REFRESH_TOKEN_EXPIRATION) {

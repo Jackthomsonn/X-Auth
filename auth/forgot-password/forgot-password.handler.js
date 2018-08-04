@@ -5,113 +5,84 @@ const utils = require('../../utils')
 const TokenHandler = require('../token/token.handler')
 const PasswordResetEmailTemplate = require('../../templates/password-reset')
 
+const { InternalServerError, BadRequest } = require('dynamic-route-generator')
+
 class ForgottenPasswordHandler {
-  static initiatePasswordResetRequest(req, res) {
+  static initiatePasswordResetRequest(req, res, next) {
     const { email } = req.body
 
+    if (!email) {
+      next(new BadRequest('You must provide an email'))
+    }
+
     userModel.findOne({ email }, (err, user) => {
-      const data = utils.buildDataModelForJwt(user)
-      const token = TokenHandler.signToken(data, env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD, env.JWT_TOKEN_EXPIRATION)
-      const url = utils.buildUrlQuery(req, 'auth/forgotten-password', [`email=${email}`, `${token}`])
-
-      if (err) {
-        return res.status(500).send({
-          dev_message: 'internal server error',
-          user_message: 'An internal server error occurred',
-          moreInformation: err,
-          status: 500
-        })
-      }
-
-      if (!user.verified) {
-        return res.status(403).send({
-          dev_message: 'account not verified',
-          user_message: 'This account is not yet verified',
-          status: 403
-        })
-      }
-
-      if (!email) {
-        return res.status(404).send({
-          dev_message: 'non existent email',
-          user_message: 'That email does not exist. Please try again',
-          status: 404
-        })
+      if (!user) {
+        next(new BadRequest('A user with that email does not exist'))
       } else {
-        sendmail({
-          from: env.DOMAIN_EMAIL,
-          to: email,
-          subject: env.APP_NAME + ' - Password reset request',
-          html: PasswordResetEmailTemplate(url),
-        }, err => {
-          if (err) {
-            return res.status(400).send({
-              dev_message: 'email account does not exist',
-              user_message: 'The email address on your account doesn\'t seem to exist',
-              status: 400
-            })
-          } else {
-            return res.status(200).send()
-          }
-        })
+        const data = utils.buildDataModelForJwt(user)
+        const token = TokenHandler.signToken(data, env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD, env.JWT_TOKEN_EXPIRATION)
+        const url = utils.buildUrlQuery(req, 'auth/forgotten-password', [`email=${email}`, `${token}`])
+
+        if (!user.verified) {
+          next(new BadRequest('This account is not yet verified. Please check your emails and verify your account'))
+        }
+
+        if (!email) {
+          next(new BadRequest('That email does not exist. Please try again'))
+        } else {
+          sendmail({
+            from: env.DOMAIN_EMAIL,
+            to: email,
+            subject: env.APP_NAME + ' - Password reset request',
+            html: PasswordResetEmailTemplate(url),
+          }, err => {
+            if (err) {
+              next(new BadRequest('The email address on your account doesn\'t seem to exist'))
+            } else {
+              res.status(200).send()
+            }
+          })
+        }
       }
     })
   }
 
-  static updatePassword(req, res) {
+  static updatePassword(req, res, next) {
     const { email, password } = req.body
 
     userModel.findOne({ email }, (err, user) => {
       if (err) {
-        return res.status(500).send({
-          dev_message: 'internal server error',
-          user_message: 'An internal server error occurred',
-          moreInformation: err,
-          status: 500
-        })
+        return next(new InternalServerError())
+      }
+
+      if(!password) {
+        return next(new BadRequest('You must supply a new password'))
       }
 
       if (!user) {
-        return res.status(404).send({
-          dev_message: 'account not found',
-          user_message: 'That account could not be found, please make sure both your username and password are correct',
-          status: 404
-        })
+        return next(
+          new BadRequest('That account could not be found, please make sure both your username and password are correct')
+        )
       } else {
         user.resetPassword(password, (err, newPassword) => {
           if (err) {
-            return res.status(500).send({
-              dev_message: 'internal server error',
-              user_message: 'An internal server error occurred',
-              moreInformation: err,
-              status: 500
-            })
+            return next(new InternalServerError())
           }
 
           if (!utils.validatePassword(password)) {
-            return res.status(400).send({
-              dev_message: 'password criteria not met',
-              user_message: 'The password specified does not match the specified criteria',
-              moreInformation: err,
-              status: 400
-            })
+            return next(new BadRequest('The password specified does not match the specified criteria'))
           }
 
           userModel.findOneAndUpdate({ email }, { $set: { password: newPassword } }, err => {
             if (err) {
-              return res.status(500).send({
-                dev_message: 'internal server error',
-                user_message: 'An internal server error occurred',
-                moreInformation: err,
-                status: 500
-              })
+              next(new InternalServerError())
+            } else {
+              res.status(200).send()
             }
-
-            return res.status(200).send()
           })
         })
       }
-    })
+    });
   }
 }
 

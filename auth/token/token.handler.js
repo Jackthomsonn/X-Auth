@@ -3,83 +3,81 @@ const env = require('../../environment/env')
 const utils = require('../../utils')
 const refreshTokenModel = require('../../models/refresh-token.model').getModel()
 
+const { InternalServerError, Unauthorized, Forbidden } = require('dynamic-route-generator')
+
 class TokenHandler {
   static verifyToken(authKey, req, res, next) {
     if (req.headers['authorization']) {
       const accessToken = req.headers['authorization'].split(' ')[1]
-      const refreshToken = req.headers['x-refresh'] ? req.headers['x-refresh'] : undefined
 
       jwt.verify(accessToken, authKey, (err) => {
         if (err) {
           if (err.name === 'TokenExpiredError') {
-            this.refreshToken(accessToken, refreshToken, res, next)
+            next(new Unauthorized('The token provided has expired'))
           } else {
-            return res.status(403).send({
-              dev_message: 'invalid token',
-              user_message: 'Invalid token provided',
-              status: 403
-            })
+            next(new Forbidden('Invalid token provided'))
           }
         } else {
           next()
         }
       })
     } else {
-      return res.status(403).send({
-        dev_message: 'no token',
-        user_message: 'No token provided',
-        status: 403
-      })
+      next(new Forbidden('No token provided'))
     }
   }
 
-  static refreshToken(accessToken, refreshToke, res, next) {
-    const { username } = jwt.decode(accessToken).data ? jwt.decode(accessToken).data : {}
+  static getRefreshToken(accessToken, res, next) {
+    if (!accessToken) {
+      next(new Forbidden('You must supply a valid access token'))
+    }
 
-    jwt.verify(refreshToke, env.REFRESH_TOKEN_SECRET_KEY, (err) => {
+    const decodedToken = jwt.decode(accessToken)
+
+    if (decodedToken === null) {
+      next(new Forbidden('Invalid access token provided'))
+    }
+
+    const { username } = decodedToken.data ? decodedToken.data : {}
+
+    refreshTokenModel.collection.findOne({
+      username: username
+    }, (err, doc) => {
       if (err) {
-        return res.status(403).send({
-          dev_message: 'invalid refresh token',
-          user_message: 'Invalid refresh token provided',
-          status: 403
-        })
+        next(new InternalServerError())
       } else {
-        refreshTokenModel.collection.findOne({
-          username: username
-        }, (err, doc) => {
-          if (err) {
-            return res.status(500).send({
-              dev_message: 'internal server error',
-              user_message: 'An internal server error occurred',
-              moreInformation: err,
-              status: 500
-            })
-          } else {
-            const { status, username, refreshToken } = doc ? doc : {};
-
-            if (status === 'AUTHENTICATED' && refreshToke === refreshToken) {
-              const userModel = require('../../models/user.model').getModel()
-
-              userModel.findOne({ username }, (err, user) => {
-                if (user) {
-                  const updatedUserData = utils.buildDataModelForJwt(user)
-                  const { username } = updatedUserData
-
-                  utils.setAccessToken(updatedUserData, res)
-                  utils.setRefreshToken(username, res)
-                }
-              })
-
-              next()
+        if (doc) {
+          jwt.verify(doc.refreshToken, env.REFRESH_TOKEN_SECRET_KEY, (err) => {
+            if (err) {
+              next(new Forbidden('Invalid refresh token provided'))
             } else {
-              return res.status(403).send({
-                dev_message: 'revoked refresh token',
-                user_message: 'Revoked refresh token provided',
-                status: 403
-              })
+              const { status, username } = doc ? doc : {};
+
+              if (status === 'AUTHENTICATED') {
+                const userModel = require('../../models/user.model').getModel()
+
+                userModel.findOne({ username }, (err, user) => {
+                  if (err) {
+                    next(new InternalServerError())
+                  } else {
+                    if (user) {
+                      const updatedUserData = utils.buildDataModelForJwt(user)
+                      const { username } = updatedUserData
+
+                      utils.setAccessToken(updatedUserData, res)
+                      utils.setRefreshToken(username, res)
+
+                      next()
+                    }
+                  }
+                })
+              } else {
+                next(new Forbidden('Revoked refresh token provided'))
+              }
             }
-          }
-        })
+          })
+        } else {
+          next(new Forbidden('It looks like your account does not have a refresh token'))
+        }
       }
     })
   }
