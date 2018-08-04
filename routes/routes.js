@@ -22,7 +22,7 @@ const routes = [
       handlers: [AuthHandler.handleTwoFactorAuthentication]
     }]
   }, {
-    uri: '/auth/verify', // Handles verification from email
+    uri: '/auth/verify', // Handles verification from email and redirects to applications base location
     model: UserModel,
     methods: [{
       name: 'get',
@@ -59,41 +59,10 @@ const routes = [
     }]
   },
   {
-    uri: '/auth/forgotten-password', // Handles at the VIEW level
+    uri: '/auth/forgotten-password', // Handles at the API Level
     model: UserModel,
     methods: [{
-      name: 'get',
-      handlers: [(req, res, next) => {
-        let template = env.FORGOTTEN_PASSWORD_PAGE_TEMPLATE
-          ? env.FORGOTTEN_PASSWORD_PAGE_TEMPLATE
-          : require('../templates/forgotten-password')
-
-        template += `
-          <script>
-            const token = 'Bearer ' + window.location.search.split('&')[1]
-            const email = window.location.search.split('q')[1].split('=')[2].split('&')[0]
-        
-            const button = document.querySelector('button')
-            document.querySelector('#email').value = email
-        
-            button.addEventListener('click', changePassword)
-        
-            function changePassword() {
-              fetch(window.location.protocol + 'update-password', {
-                body: JSON.stringify({
-                  email: email,
-                  password: document.querySelector('#password').value
-                }),
-                headers: {
-                  'authorization': token,
-                  'Content-Type': 'application/json'
-                },
-                method: 'POST'
-              })
-            }
-          </script>`
-          next()
-      }]
+      name: 'get'
     }]
   },
   {

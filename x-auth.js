@@ -29,8 +29,6 @@ class XAuth {
     // Optionals
     env.TEXT_MAGIC_USERNAME = props.textMagicUsername
     env.TEXT_MAGIC_TOKEN = props.textMagicToken
-    env.VERIFICATION_PAGE_TEMPLATE = props.verificationPageTemplate
-    env.FORGOTTEN_PASSWORD_PAGE_TEMPLATE = props.forgottenPasswordPagetemplate
     env.THEME_COLOUR = props.themeColour
   }
 
