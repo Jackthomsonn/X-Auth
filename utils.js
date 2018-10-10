@@ -93,7 +93,7 @@ class Utils {
     return model
   }
 
-  static setRefreshToken(username, res) {
+  static setRefreshToken(username) {
     const refreshToken = require('./auth/token/token.handler').signToken({}, env.REFRESH_TOKEN_SECRET_KEY, env.REFRESH_TOKEN_EXPIRATION)
 
     try {
