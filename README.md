@@ -8,7 +8,7 @@ X-Auth is a plugin built for the Dynamic Route Generator that gives you a fully 
 - Two Factor Login (In progress)
 - Forgot Password (Complete)
 - Change Password (Complete)
-- Email verifications (Complete)
+- Email Verifications (Complete)
 - SMS Integration for two factor authentication (Optional, will need to pay; current client configured is Text Magic)
 
 This plugin is in beta and **SHOULD NOT** be used in a production environment as of yet. There is a lot of work and testing that needs to be carried out to prove this system is secure
@@ -25,24 +25,25 @@ const { XAuth, CheckAuthentication } = require('x-auth')
 
 const GameModel = require('./game.model')
 
-mongoose.connect('mongodb://localhost/test')
+mongoose.connect('mongo_uri')
 
 XAuth.setupProps({
-  appName: 'XAuth Test',
-  authSecretKey: process.env.SECRET_SECRET,
-  authSecretKeyForgottenPassword: process.env.SECRET_KEY_FORGOTTEN_PASSWORD,
-  cookieName: 'xauth-access',
-  cookieNameForgottenPassword: 'xauth-forgotten-password-test',
-  domainEmail: 'hello@email.com',
-  jwtTokenExpiration: process.env.JWT_EXPIRATION, // Number in milliseconds
+  appName: 'Application Name',
+  authSecretKey: process.env.AUTH_SECRET_KEY,
+  authSecretKeyForgottenPassword: process.env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD,
+  cookieName: 'cookie-name',
+  cookieNameForgottenPassword: 'cookie-forgotten-password-name',
+  domainEmail: 'hello@youremail.com',
+  baseUri: 'api',
+  jwtTokenExpiration: 120000, // 2 minutes
   saltWorkFactor: 10,
-  databaseUri: 'mongodb://localhost/test',
-  themeColour: '#4096EE',
+  databaseUri: 'mongo_uri',
+  themeColour: '#449DD1',
   emailVerification: true,
-  passwordStrength: '1',
-  refreshTokenExpiration: process.env.REFRESH_EXPIRATION, // Number in milliseconds
-  refreshTokenSecretKey: process.env.REFRESH_SECRET,
-  refreshTokenCookieName: 'x-auth-refresh'
+  passwordStrength: '1', // 1 includes special chracters and 0 does not
+  refreshTokenExpiration: 3600000, // 1 hour
+  refreshTokenSecretKey: process.env.REFRESH_TOKEN_SECRET_KEY,
+  refreshTokenCookieName: 'cookie-refresh-name'
 })
 
 new RouteGenerator({
@@ -65,11 +66,11 @@ app.listen(process.env.PORT || 8080)
 ```
 
 ## Access Api
-The api with the example above when run with node will be hosted on port 8080. The endpoints are as follows:
+The example above will be hosted on port 8080. The endpoints are as follows:
 
 **/auth/login** - Used for the login process
 
-When a user logs in, an access token is generated and set as a cookie on the client machine with the name specified in the XAuth options above `cookieName`. Your application will need to get the values from this cookie and send them with every request. Make sure you are using an SSL encryption otherwise these values will be transferred over the wire in plain text, SSL will make sure to serialize the values so if anyone is sniffing the traffic, it will make it a lot harder for them to gain access to your account
+When a user logs in, an access token is generated and set as a cookie on the client machine with the name specified in the XAuth options above `cookieName`. Your application will need to get the values from this cookie and send them with every request. Make sure you are using an SSL encryption otherwise these values will be transferred over the wire in plain text, SSL will make sure to serialize the values so if anyone is sniffing the traffic, it will make it a lot harder for them to gain access to the users account
 
 ```js
 {
@@ -80,7 +81,7 @@ When a user logs in, an access token is generated and set as a cookie on the cli
 
 **/auth/login/authenticate** - Handles two factor authentication
 
-For this, you must provide the username as a query param that you are trying to authenticate and the token is part of the POST request, for example:
+For this, you must provide the username as a query param that you are trying to authenticate and the token is part of the POST request. The token code will be sent to the users mobile
 
 `/auth/login/authenticate?q=username=admin`
 
@@ -90,9 +91,9 @@ For this, you must provide the username as a query param that you are trying to 
 }
 ```
 
-***[Internal]*** **/auth/verify** - Handles the update of a password (This is handled for you from the email template. If you provide your own verification page template `env.VERIFICATION_PAGE_TEMPLATE`, X-Auth will inject the required code to suffice the request)
-
 **/auth/register** - Used for the registration process
+
+This request is made when adding a user to the service. If you wish to add any custom values to the user object you can populate the property, `properties` with any custom values you like. Be mindful that this data is stored as part of the JWT so refrain from storing any personal data here
 
 ```js
 {
@@ -107,9 +108,22 @@ For this, you must provide the username as a query param that you are trying to 
 
 **/auth/reset-password-request** - Used for an initial reset password request
 
+If a valid email is supplied, the user will recieve an email with a link that points to `/auth/forgotten-password`. You must create a page which lives on this url and has both an email and new password input and makes a call to the /auth/update-password endpoint
+
 ```js
 {
-  "email": "hello@email.com" // This will trigger an email to be sent to the user
+  "email": "hello@email.com"
+}
+```
+
+**/auth/update-password** - Used to reset a password
+
+When a call is made to this endpoint a check will be made to make sure the password strength matches the services rules. If successful, the password will be changed and the user will be redirected to the login page
+
+```js
+{
+  "email": "hello@email.com",
+  "password": "newPassword"
 }
 ```
 

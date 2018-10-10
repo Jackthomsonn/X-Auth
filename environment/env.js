@@ -6,6 +6,7 @@ const env = {
   THEME_COLOUR: undefined,
   EMAIL_VERIFICATION: undefined,
   BASE_URI: undefined,
+
   // Security settings (Required)
   SALT_WORK_FACTOR: undefined,
   COOKIE_NAME: undefined,
