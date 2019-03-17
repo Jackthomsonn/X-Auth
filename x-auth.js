@@ -10,6 +10,7 @@ class XAuth {
   }
 
   static setupProps(props) {
+    env.APP_LOGO = props.appLogo
     env.APP_NAME = props.appName
     env.AUTH_SECRET_KEY = props.authSecretKey
     env.AUTH_SECRET_KEY_FORGOTTEN_PASSWORD = props.authSecretKeyForgottenPassword
@@ -34,7 +35,9 @@ class XAuth {
 
   apply(routeGenerator) {
     try {
-      if (!env.APP_NAME) {
+      if (!env.APP_LOGO) {
+        throw ('appLogo')
+      } else if (!env.APP_NAME) {
         throw ('appName')
       } else if (!env.AUTH_SECRET_KEY) {
         throw ('authSecretKey')

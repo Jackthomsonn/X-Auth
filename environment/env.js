@@ -1,6 +1,7 @@
 const env = {
   // App specific details (Required)
   DOMAIN_EMAIL: undefined,
+  APP_LOGO: undefined,
   APP_NAME: undefined,
   DATABASE_URI: undefined,
   THEME_COLOUR: undefined,
