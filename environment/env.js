@@ -19,6 +19,8 @@ const env = {
   REFRESH_TOKEN_EXPIRATION: undefined,
   REFRESH_TOKEN_SECRET_KEY: undefined,
   REFRESH_TOKEN_COOKIE_NAME: undefined,
+  UPDATE_PROFILE_JWT_EXPIRATION: undefined,
+  UPDATE_PROFILE_JWT_KEY: undefined,
 
   // Text messaging client (two factor auth enabled account only / By default, two factor is not set) (Optional)
   TEXT_MAGIC_USERNAME: undefined,

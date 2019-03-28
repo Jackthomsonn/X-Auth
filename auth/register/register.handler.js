@@ -10,18 +10,26 @@ const { InternalServerError, Forbidden, BadRequest } = require('dynamic-route-ge
 
 class RegisterHandler {
   static handleRegistration(req, _res, next) {
-    const { username, password, email } = req.body
+    const { username, password, email, phoneNumber } = req.body
     let data = undefined
 
     userModel.findOne({ username }, (err, user) => {
       const token = TokenHandler.signToken({}, env.AUTH_SECRET_KEY, env.JWT_TOKEN_EXPIRATION)
 
-      if(err) {
+      if (err) {
         return next(new InternalServerError())
       }
 
-      if(user) {
+      if (user) {
         return next(new BadRequest('That username has been taken, please choose another one'))
+      }
+
+      if (!utils.validateEmail(email)) {
+        return next(new BadRequest('The email specified does not seem to exist'))
+      }
+
+      if (!utils.validatePhoneNumber(phoneNumber)) {
+        return next(new BadRequest('The phone number specified does not seem to exist'))
       }
 
       if (!utils.validatePassword(password)) {
@@ -69,7 +77,7 @@ class RegisterHandler {
       }
 
       if (!user) {
-        next(BadRequest('That account could not be found, please make sure both your username and password are correct'))
+        next(BadRequest('That account could not be found, please make sure both your email is correct'))
       } else {
         if (user.verificationToken === token) {
           user.verifyAccount(userModel, email, err => {
@@ -82,6 +90,52 @@ class RegisterHandler {
         } else {
           next(new Forbidden('The verification token supplied was invalid'))
         }
+      }
+    })
+  }
+
+  static verifyEmailChange(req, res, next) {
+    const oldEmail = req.url.split('&')[0].split('=').pop();
+    const email = req.url.split('&')[1].split('=').pop();
+
+    userModel.findOne({ email: oldEmail }, (err, user) => {
+      if (err) {
+        next(new InternalServerError())
+      }
+
+      if (!user) {
+        next(new BadRequest('That account could not be found, please make sure both your email is correct'))
+      } else {
+        user.verifyEmailChanged(userModel, oldEmail, email, err => {
+          if (err) {
+            next(new InternalServerError())
+          } else {
+            res.redirect('/')
+          }
+        })
+      }
+    })
+  }
+
+  static verifyPhoneNumberChange(req, res, next) {
+    const oldPhoneNumber = req.url.split('&')[0].split('=').pop();
+    const phoneNumber = req.url.split('&')[1].split('=').pop();
+
+    userModel.findOne({ phoneNumber: oldPhoneNumber }, (err, user) => {
+      if (err) {
+        next(new InternalServerError())
+      }
+
+      if (!user) {
+        next(new BadRequest('That account could not be found'))
+      } else {
+        user.verifyPhoneNumberChange(userModel, oldPhoneNumber, phoneNumber, err => {
+          if (err) {
+            next(new InternalServerError())
+          } else {
+            res.redirect('/')
+          }
+        })
       }
     })
   }

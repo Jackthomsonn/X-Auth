@@ -23,4 +23,4 @@ module.exports = new RefreshTokenSchema({
     required: false,
     type: String
   }
-})
+}, { timestamps: true })

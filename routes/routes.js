@@ -8,6 +8,17 @@ const env = require('../environment/env')
 
 const routes = [
   {
+    uri: '/auth/users', // Handles the retrieval and updating of a singular user profile
+    model: UserModel,
+    methods: [{
+      name: 'get',
+      handlers: [AuthHandler.getProfile]
+    }, {
+      name: 'put',
+      handlers: [AuthHandler.updateProfile]
+    }]
+  },
+  {
     uri: '/auth/login', // Handles login at the API level
     model: UserModel,
     methods: [{
@@ -27,6 +38,20 @@ const routes = [
     methods: [{
       name: 'get',
       handlers: [AuthHandler.verifyEmail]
+    }]
+  }, {
+    uri: '/auth/verify-email-change', // Handles verification for email change
+    model: UserModel,
+    methods: [{
+      name: 'get',
+      handlers: [AuthHandler.checkAuthenticationForProfileUpdate, AuthHandler.verifyEmailChange]
+    }]
+  }, {
+    uri: '/auth/verify-phone-number-change', // Handles verification for phone number change
+    model: UserModel,
+    methods: [{
+      name: 'get',
+      handlers: [AuthHandler.checkAuthenticationForProfileUpdate, AuthHandler.verifyPhoneNumberChange]
     }]
   }, {
     uri: '/auth/register', // Handles registration at the API level

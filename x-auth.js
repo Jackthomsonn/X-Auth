@@ -26,6 +26,8 @@ class XAuth {
     env.REFRESH_TOKEN_EXPIRATION = props.refreshTokenExpiration
     env.REFRESH_TOKEN_SECRET_KEY = props.refreshTokenSecretKey
     env.REFRESH_TOKEN_COOKIE_NAME = props.refreshTokenCookieName
+    env.UPDATE_PROFILE_JWT_EXPIRATION = props.updateProfileJwtExpiration
+    env.UPDATE_PROFILE_JWT_KEY = props.updateProfileJwtKey
 
     // Optionals
     env.TEXT_MAGIC_USERNAME = props.textMagicUsername
@@ -69,6 +71,10 @@ class XAuth {
         throw ('refreshTokenSecretKey')
       } else if (!env.REFRESH_TOKEN_COOKIE_NAME) {
         throw ('refreshTokenCookieName')
+      } else if (!env.UPDATE_PROFILE_JWT_EXPIRATION) {
+        throw ('updateProfileJwtExpiration');
+      } else if (!env.UPDATE_PROFILE_JWT_KEY) {
+        throw ('updateProfileJwtKey')
       }
     } catch (property) {
       if (property === 'refreshTokenExpirationInvalid') {

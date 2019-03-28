@@ -104,7 +104,7 @@ class Utils {
           status: 'AUTHENTICATED'
         }
       }, { upsert: true })
-    } catch(error) {
+    } catch (error) {
       console.log(error)
     }
   }

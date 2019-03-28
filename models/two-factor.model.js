@@ -15,4 +15,4 @@ module.exports = new TwoFactorSchema({
     required: true,
     type: Number
   }
-})
+}, { timestamps: true })
