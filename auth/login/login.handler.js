@@ -25,7 +25,7 @@ class LoginHandler {
             const { username } = data
 
             if (isMatch && !user.twoFactorAuthEnabled) {
-              // utils.setAccessToken(data, accessToken, res)
+              utils.setAccessToken(data, accessToken, res)
               utils.setRefreshToken(username, res)
 
               res.status(200).send({

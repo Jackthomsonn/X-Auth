@@ -64,7 +64,7 @@ class TokenHandler {
                       const updatedUserData = utils.buildDataModelForJwt(user)
                       const { username } = updatedUserData
 
-                      // utils.setAccessToken(updatedUserData, res)
+                      utils.setAccessToken(updatedUserData, res)
                       utils.setRefreshToken(username, res)
 
                       res.status(200).send({
