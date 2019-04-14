@@ -7,16 +7,16 @@ class ProfileHandler {
 
     userModel.findById(id, (err, user) => {
       if (err) {
-        next(new NotFound('User not found'))
+        return next(new NotFound('User not found'))
       }
 
       if (!user) {
-        next(new BadRequest('Account Not Found'));
+        return next(new BadRequest('Account Not Found'));
       } else {
         if (!user.verified) {
-          next(new BadRequest('Account not verified'));
+          return next(new BadRequest('Account not verified'));
         } else {
-          res.status(200).send({
+          return res.status(200).send({
             username: user.username,
             email: user.email,
             phoneNumber: user.phoneNumber,

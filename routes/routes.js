@@ -12,10 +12,10 @@ const routes = [
     model: UserModel,
     methods: [{
       name: 'get',
-      handlers: [AuthHandler.getProfile]
+      handlers: [AuthHandler.checkAuthentication, AuthHandler.getProfile]
     }, {
       name: 'put',
-      handlers: [AuthHandler.updateProfile]
+      handlers: [AuthHandler.checkAuthentication, AuthHandler.updateProfile]
     }]
   },
   {

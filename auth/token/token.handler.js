@@ -56,6 +56,7 @@ class TokenHandler {
                 const userModel = require('../../models/user.model').getModel()
 
                 userModel.findOne({ username }, (err, user) => {
+                  console.log(err)
                   if (err) {
                     next(new InternalServerError())
                   } else {
@@ -63,10 +64,13 @@ class TokenHandler {
                       const updatedUserData = utils.buildDataModelForJwt(user)
                       const { username } = updatedUserData
 
-                      utils.setAccessToken(updatedUserData, res)
+                      // utils.setAccessToken(updatedUserData, res)
                       utils.setRefreshToken(username, res)
 
-                      next()
+                      res.status(200).send({
+                        accessToken: require('../../auth/token/token.handler').signToken(updatedUserData, env.AUTH_SECRET_KEY, env.JWT_TOKEN_EXPIRATION),
+                        userId: user._id
+                      })
                     }
                   }
                 })

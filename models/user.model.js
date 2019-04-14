@@ -9,6 +9,7 @@ const sendmail = require('sendmail')()
 const VerifyEmailChangeTemplate = require('../templates/verify-email-change')
 const VerifyPhoneNumberChangeTemplate = require('../templates/verify-phone-number-change')
 const { InternalServerError, BadRequest } = require('dynamic-route-generator')
+const event = require('../events')
 
 class UserSchema extends mongoose.Schema {
   constructor(definition) {

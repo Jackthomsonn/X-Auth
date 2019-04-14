@@ -24,10 +24,12 @@ class TwoFactorAuthenticationHandler {
             const data = utils.buildDataModelForJwt(user)
             const { username } = data
 
-            utils.setAccessToken(data, res)
             utils.setRefreshToken(username, res)
 
-            next()
+            res.status(200).send({
+              accessToken: accessToken,
+              userId: user._id
+            })
           }
         })
       }
