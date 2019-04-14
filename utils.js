@@ -112,6 +112,9 @@ class Utils {
   static setAccessToken(data, res) {
     const accessToken = require('./auth/token/token.handler').signToken(data, env.AUTH_SECRET_KEY, env.JWT_TOKEN_EXPIRATION)
 
+    if (!res.cookie) {
+      return;
+    }
     res.cookie(env.COOKIE_NAME, accessToken, {
       maxAge: env.REFRESH_TOKEN_EXPIRATION
     })
