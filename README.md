@@ -1,3 +1,6 @@
+# IMPORTANT
+When I first started this and the Dynamic Route Generator project, I had a limited understanding of the tools available to myself that achieve the same (and better) goal. These projects were built as my interest in back-end development rose & as a result I now have a better understanding of the tools and best practices that are out there. Not only did I learn that there are tools that achieve the same goals but I also learnt that sometimes, tools are out there to help us developers save time and money and from a business perspective, we would rather not have to deal with sensitve data and rather offload that responsibility to field experts. All this being said, I am still very proud of both projects. They taught me a lot about node itself & taught me to think in a different way. This project is now no longer maintained and **SHOULD NOT** be used in a production environment.
+
 # X-Auth
 
 X-Auth is a plugin built for the Dynamic Route Generator that gives you a fully fledged login system for your web applications. This is a plug and play plugin with a few lines of configuration setup.
