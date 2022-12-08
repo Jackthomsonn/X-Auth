@@ -27,7 +27,7 @@
     "awesome-phonenumber": "^2.2.5",
     "bcryptjs": "2.4.3",
     "dynamic-route-generator": "^1.5.1",
-    "express": "4.16.2",
+    "express": "4.18.2",
     "jsonwebtoken": "8.2.0",
     "moment": "^2.22.1",
     "mongoose": "5.7.5",
